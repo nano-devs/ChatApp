@@ -1,43 +1,35 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using NET5AuthServerAPI.Models;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
 
 namespace NET5AuthServerAPI.Services.TokenGenerators
 {
-    public class JwtTokenGenerator : ITokenGenerator
+    public class RefreshTokenGenerator : ITokenGenerator
     {
         private readonly AuthenticationConfiguration configuration;
 
-        public JwtTokenGenerator(AuthenticationConfiguration configuration)
+        public RefreshTokenGenerator(AuthenticationConfiguration configuration)
         {
             this.configuration = configuration;
         }
 
         public string GenerateToken(User user)
         {
-            // key used to sign jwt is gonna be the same as the key used for verify jwt
-            SecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.AccessTokenSecret));
-            SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            // redundant code
 
-            List<Claim> claims = new List<Claim>()
-            {
-                new Claim("id", user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Name, user.Username),
-            };
+            // key used to sign jwt is gonna be the same as the key used for verify jwt
+            SecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.RefreshTokenSecret));
+            SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             JwtSecurityToken token = new JwtSecurityToken(
                 configuration.Issuer, // issuer domain
                 configuration.Audience, // audience
-                claims,
+                null, // claims
                 System.DateTime.UtcNow, // token valid datetime
-                System.DateTime.UtcNow.AddMinutes(configuration.AccessTokenExpirationMinutes), // token expired datetime
+                System.DateTime.UtcNow.AddMinutes(configuration.RefreshTokenExpirationMinutes), // token expired datetime
                 credentials);
 
-            // get the string of jwt token
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
