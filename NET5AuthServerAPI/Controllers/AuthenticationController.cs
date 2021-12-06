@@ -4,6 +4,7 @@ using NET5AuthServerAPI.Models.Requests;
 using NET5AuthServerAPI.Models.Responses;
 using NET5AuthServerAPI.Services.PasswordHashers;
 using NET5AuthServerAPI.Services.TokenGenerators;
+using NET5AuthServerAPI.Services.TokenValidators;
 using NET5AuthServerAPI.Services.UserRepositories;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,12 +17,22 @@ namespace NET5AuthServerAPI.Controllers
         private readonly IUserRepository userRepository;
         private readonly IPasswordHasher passwordHasher;
         private readonly ITokenGenerator accessTokenGenerator;
+        private readonly ITokenGenerator refreshTokenGenerator;
 
-        public AuthenticationController(IUserRepository userRepository, IPasswordHasher passwordHasher, ITokenGenerator accessTokenGenerator)
+        // dependency inversion!
+        private readonly RefreshTokenValidator refreshTokenValidator;
+
+        public AuthenticationController(IUserRepository userRepository, 
+            IPasswordHasher passwordHasher, 
+            AccessTokenGenerator accessTokenGenerator, 
+            RefreshTokenGenerator refreshTokenGenerator,
+            RefreshTokenValidator refreshTokenValidator)
         {
             this.userRepository = userRepository;
             this.passwordHasher = passwordHasher;
             this.accessTokenGenerator = accessTokenGenerator;
+            this.refreshTokenGenerator = refreshTokenGenerator;
+            this.refreshTokenValidator = refreshTokenValidator;
         }
 
         [HttpPost("register")]
@@ -83,11 +94,33 @@ namespace NET5AuthServerAPI.Controllers
             }
 
             string accessToken = accessTokenGenerator.GenerateToken(user);
+            string refreshToken = refreshTokenGenerator.GenerateToken(user);
 
             return Ok(new AuthenticatedUserResponse()
             { 
-                AccessToken = accessToken 
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
             });
+        }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshRequest refreshRequest)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequestModelState();
+            }
+
+            bool isValidRefreshToken = refreshTokenValidator.Validate(refreshRequest.RefreshToken);
+            if (!isValidRefreshToken)
+            {
+                // token may be expired, invalid, etc. but this good enough for now.
+                return BadRequest(new ErrorResponse("Invalid refresh token."));
+            }
+
+            // update token validator, store user id & refresh token to database.
+
+            return Ok();
         }
 
         private IActionResult BadRequestModelState()
