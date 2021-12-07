@@ -2,7 +2,9 @@
 using NET5AuthServerAPI.Models;
 using NET5AuthServerAPI.Models.Requests;
 using NET5AuthServerAPI.Models.Responses;
+using NET5AuthServerAPI.Services.Authenticators;
 using NET5AuthServerAPI.Services.PasswordHashers;
+using NET5AuthServerAPI.Services.RefreshTokenRepositories;
 using NET5AuthServerAPI.Services.TokenGenerators;
 using NET5AuthServerAPI.Services.TokenValidators;
 using NET5AuthServerAPI.Services.UserRepositories;
@@ -15,23 +17,23 @@ namespace NET5AuthServerAPI.Controllers
     public class AuthenticationController : Controller
     {
         private readonly IUserRepository userRepository;
+        private readonly IRefreshTokenRepository refreshTokenRepository;
         private readonly IPasswordHasher passwordHasher;
-        private readonly ITokenGenerator accessTokenGenerator;
-        private readonly ITokenGenerator refreshTokenGenerator;
+        private readonly Authenticator authenticator;
 
         // dependency inversion!
         private readonly RefreshTokenValidator refreshTokenValidator;
 
         public AuthenticationController(IUserRepository userRepository, 
+            IRefreshTokenRepository refreshTokenRepository, 
             IPasswordHasher passwordHasher, 
-            AccessTokenGenerator accessTokenGenerator, 
-            RefreshTokenGenerator refreshTokenGenerator,
+            Authenticator authenticator, 
             RefreshTokenValidator refreshTokenValidator)
         {
             this.userRepository = userRepository;
+            this.refreshTokenRepository = refreshTokenRepository;
             this.passwordHasher = passwordHasher;
-            this.accessTokenGenerator = accessTokenGenerator;
-            this.refreshTokenGenerator = refreshTokenGenerator;
+            this.authenticator = authenticator;
             this.refreshTokenValidator = refreshTokenValidator;
         }
 
@@ -93,14 +95,9 @@ namespace NET5AuthServerAPI.Controllers
                 return Unauthorized();
             }
 
-            string accessToken = accessTokenGenerator.GenerateToken(user);
-            string refreshToken = refreshTokenGenerator.GenerateToken(user);
+            AuthenticatedUserResponse response = await authenticator.Authenticate(user);
 
-            return Ok(new AuthenticatedUserResponse()
-            { 
-                AccessToken = accessToken,
-                RefreshToken = refreshToken
-            });
+            return Ok(response);
         }
 
         [HttpPost("refresh")]
@@ -118,9 +115,23 @@ namespace NET5AuthServerAPI.Controllers
                 return BadRequest(new ErrorResponse("Invalid refresh token."));
             }
 
-            // update token validator, store user id & refresh token to database.
+            RefreshToken refreshTokenDTO = await refreshTokenRepository.GetByToken(refreshRequest.RefreshToken);
+            if (refreshTokenDTO == null)
+            {
+                return NotFound(new ErrorResponse("Invaliid refresh token."));
+            }
 
-            return Ok();
+            await refreshTokenRepository.Delete(refreshTokenDTO.Id);
+
+            User user = await userRepository.GetById(refreshTokenDTO.UserId);
+            if (user == null)
+            {
+                return NotFound(new ErrorResponse("User not found."));
+            }
+
+            AuthenticatedUserResponse response = await authenticator.Authenticate(user);
+
+            return Ok(response);
         }
 
         private IActionResult BadRequestModelState()
