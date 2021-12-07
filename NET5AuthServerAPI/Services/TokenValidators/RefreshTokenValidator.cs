@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NET5AuthServerAPI.Services.TokenValidators
 {
-    public class RefreshTokenValidator
+    public class RefreshTokenValidator : ITokenValidator
     {
         private readonly AuthenticationConfiguration configuration;
 

@@ -21,6 +21,11 @@ namespace NET5AuthServerAPI.Services.UserRepositories
             return Task.FromResult(users.Find(user => user.Email == email));
         }
 
+        public Task<User> GetById(int id)
+        {
+            return Task.FromResult(users.Find(user => user.Id == id));
+        }
+
         public Task<User> GetByUserName(string username)
         {
             return Task.FromResult(users.Find(user => user.Username == username));
