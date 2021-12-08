@@ -8,10 +8,13 @@ namespace NET5AuthServerAPI.Services.RefreshTokenRepositories
     public class InMemoryRefreshTokenRepository : IRefreshTokenRepository
     {
         private readonly List<RefreshToken> refreshTokens = new List<RefreshToken>();
+        private int counter = 0;
 
         public Task Create(RefreshToken refreshToken)
         {
-            refreshToken.Id = refreshTokens.Count + 1; // buggy. for testing purpose only.
+            refreshToken.Id = counter + 1; // buggy. for testing purpose only.
+            counter += 1;
+
             refreshTokens.Add(refreshToken);
 
             return Task.CompletedTask;

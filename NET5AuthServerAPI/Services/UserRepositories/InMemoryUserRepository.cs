@@ -7,10 +7,13 @@ namespace NET5AuthServerAPI.Services.UserRepositories
     public class InMemoryUserRepository : IUserRepository
     {
         private readonly List<User> users = new List<User>();
+        private int counter = 0;
 
         public Task<User> Create(User user)
         {
-            user.Id = users.Count;
+            user.Id = counter + 1;
+            counter += 1;
+
             users.Add(user);
 
             return Task.FromResult(user);
