@@ -4,8 +4,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NET5AuthServerAPI.Models;
+using NET5AuthServerAPI.Services.Authenticators;
 using NET5AuthServerAPI.Services.PasswordHashers;
+using NET5AuthServerAPI.Services.RefreshTokenRepositories;
 using NET5AuthServerAPI.Services.TokenGenerators;
+using NET5AuthServerAPI.Services.TokenValidators;
 using NET5AuthServerAPI.Services.UserRepositories;
 
 namespace NET5AuthServerAPI
@@ -29,9 +32,13 @@ namespace NET5AuthServerAPI
             configuration.Bind("Authentication", authConfig);
             services.AddSingleton(authConfig);
 
-            services.AddSingleton<ITokenGenerator, JwtTokenGenerator>();
+            services.AddSingleton<ITokenGenerator, AccessTokenGenerator>();
+            services.AddSingleton<ITokenGenerator, RefreshTokenGenerator>();
+            services.AddSingleton<ITokenValidator, RefreshTokenValidator>();
             services.AddSingleton<IPasswordHasher, BCryptHasher>();
             services.AddSingleton<IUserRepository, InMemoryUserRepository>();
+            services.AddSingleton<IRefreshTokenRepository, InMemoryRefreshTokenRepository>();
+            services.AddSingleton<Authenticator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
