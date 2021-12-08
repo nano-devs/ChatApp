@@ -13,8 +13,8 @@ namespace NET5AuthServerAPI.Services.Authenticators
         private readonly ITokenGenerator refreshTokenGenerator;
 
         public Authenticator(IRefreshTokenRepository refreshTokenRepository, 
-            ITokenGenerator accessTokenGenerator, 
-            ITokenGenerator refreshTokenGenerator)
+            AccessTokenGenerator accessTokenGenerator, 
+            RefreshTokenGenerator refreshTokenGenerator)
         {
             this.refreshTokenRepository = refreshTokenRepository;
             this.accessTokenGenerator = accessTokenGenerator;

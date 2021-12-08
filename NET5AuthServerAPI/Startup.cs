@@ -32,8 +32,8 @@ namespace NET5AuthServerAPI
             configuration.Bind("Authentication", authConfig);
             services.AddSingleton(authConfig);
 
-            services.AddSingleton<ITokenGenerator, AccessTokenGenerator>();
-            services.AddSingleton<ITokenGenerator, RefreshTokenGenerator>();
+            services.AddSingleton<AccessTokenGenerator>();
+            services.AddSingleton<RefreshTokenGenerator>();
             services.AddSingleton<ITokenValidator, RefreshTokenValidator>();
             services.AddSingleton<IPasswordHasher, BCryptHasher>();
             services.AddSingleton<IUserRepository, InMemoryUserRepository>();
