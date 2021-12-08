@@ -22,13 +22,13 @@ namespace NET5AuthServerAPI.Controllers
         private readonly Authenticator authenticator;
 
         // dependency inversion!
-        private readonly RefreshTokenValidator refreshTokenValidator;
+        private readonly ITokenValidator refreshTokenValidator;
 
         public AuthenticationController(IUserRepository userRepository, 
             IRefreshTokenRepository refreshTokenRepository, 
             IPasswordHasher passwordHasher, 
-            Authenticator authenticator, 
-            RefreshTokenValidator refreshTokenValidator)
+            Authenticator authenticator,
+            ITokenValidator refreshTokenValidator)
         {
             this.userRepository = userRepository;
             this.refreshTokenRepository = refreshTokenRepository;
