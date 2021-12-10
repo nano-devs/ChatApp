@@ -71,7 +71,7 @@ namespace NET5ChatAppServerAPI.Controllers
 		{
 			var exist = this._context.Friends
 				.AsNoTrackingWithIdentityResolution()
-				.Where(o => o.UserId== userId&& o.FriendId== friendId);
+				.Where(o => o.UserId == userId && o.FriendId == friendId);
 
 			if (exist.Any())
 			{
@@ -79,15 +79,22 @@ namespace NET5ChatAppServerAPI.Controllers
 			}
 			else
 			{
-				var friend = new Friends
+				try
 				{
-					UserId = userId,
-					FriendId=friendId
-				};
+					var friend = new Friends
+					{
+						UserId = userId,
+						FriendId = friendId
+					};
 
-				await this._context.Friends.AddAsync(friend);
-				await this._context.SaveChangesAsync();
-				return Ok();
+					await this._context.Friends.AddAsync(friend);
+					await this._context.SaveChangesAsync();
+					return Ok();
+				}
+				catch
+				{
+					return "Failed to add { friendId } to { userId }";
+				}
 			}
 		}
 
@@ -106,9 +113,16 @@ namespace NET5ChatAppServerAPI.Controllers
 
 			if (friend.Any())
 			{
-				this._context.Friends.Remove(await friend.FirstOrDefaultAsync());
-				await this._context.SaveChangesAsync();
-				return Ok();
+				try
+				{
+					this._context.Friends.Remove(await friend.FirstOrDefaultAsync());
+					await this._context.SaveChangesAsync();
+					return Ok();
+				}
+				catch
+				{
+					return $"Failed to remove friend ({ friend }) from user ({ friendId })";
+				}
 			}
 			else
 			{
