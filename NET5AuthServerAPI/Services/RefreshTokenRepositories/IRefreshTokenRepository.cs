@@ -1,4 +1,5 @@
 ﻿using NET5AuthServerAPI.Models;
+using System;
 using System.Threading.Tasks;
 
 namespace NET5AuthServerAPI.Services.RefreshTokenRepositories
@@ -7,6 +8,7 @@ namespace NET5AuthServerAPI.Services.RefreshTokenRepositories
     {
         Task Create(RefreshToken refreshToken);
         Task<RefreshToken> GetByToken(string token);
-        Task Delete(int refreshTokenId);
+        Task Delete(Guid refreshTokenId);
+        Task DeleteAll(Guid userId);
     }
 }
