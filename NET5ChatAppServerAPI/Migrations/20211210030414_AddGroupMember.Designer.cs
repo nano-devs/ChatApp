@@ -2,31 +2,37 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NET5ChatAppServerAPI.Data;
 
 namespace NET5ChatAppServerAPI.Migrations
 {
     [DbContext(typeof(ChatAppDbContext))]
-    partial class ChatAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211210030414_AddGroupMember")]
+    partial class AddGroupMember
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "5.0.11");
 
-            modelBuilder.Entity("NET5ChatAppServerAPI.Models.Friends", b =>
+            modelBuilder.Entity("NET5ChatAppServerAPI.Models.Contacts", b =>
                 {
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("FriendId")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("UserId", "FriendId");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
 
-                    b.ToTable("Friends");
+                    b.HasKey("Id");
+
+                    b.ToTable("Contacts");
                 });
 
             modelBuilder.Entity("NET5ChatAppServerAPI.Models.GroupChat", b =>
