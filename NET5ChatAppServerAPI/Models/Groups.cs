@@ -15,11 +15,6 @@ namespace NET5ChatAppServerAPI.Models
 		///		Group name.
 		/// </summary>
 		public string Name { set; get; }
-
-		/// <summary>
-		///		the group member, contains the user id of every member. 
-		/// </summary>
-		public string MemberIds { set; get; }
 	}
 
 	/// <summary>
