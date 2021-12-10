@@ -8,8 +8,7 @@ namespace NET5ChatAppServerAPI.Models
 	/// <typeparam name="T">
 	///		The type used for the primary key for the model.
 	/// </typeparam>
-	public class Contacts<T> : BaseModel<T>
-		where T : struct
+	public class Friends<T> where T : struct
 	{
 		/// <summary>
 		///		The id of user.
@@ -25,7 +24,7 @@ namespace NET5ChatAppServerAPI.Models
 	/// <summary>
 	///		Relationship of user with each other.
 	/// </summary>
-	public class Contacts : Contacts<Guid>
+	public class Friends : Friends<Guid>
 	{
 
 	}
