@@ -1,6 +1,4 @@
 ﻿
-using System;
-
 using Microsoft.EntityFrameworkCore;
 
 using NET5ChatAppServerAPI.Models;

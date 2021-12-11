@@ -19,7 +19,7 @@ namespace NET5ChatAppServerAPI.Models
 		///		The user id who send the chat or message.
 		/// </summary>
 		public T From { set; get; }
-		
+
 		/// <summary>
 		///		The group id that recieve the chat or message.
 		/// </summary>

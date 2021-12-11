@@ -96,7 +96,7 @@ namespace NET5ChatAppServerAPI.Controllers
 			{
 				this._context.PrivateChats.RemoveRange(await records.ToListAsync());
 				await this._context.SaveChangesAsync();
-				return Ok();
+				return this.Ok();
 			}
 			else
 			{

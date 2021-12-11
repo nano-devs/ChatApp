@@ -49,7 +49,7 @@ namespace NET5ChatAppServerAPI.Controllers
 				.AsNoTrackingWithIdentityResolution()
 				.Where(o => o.UserId == userId)
 				.Select(o => o.FriendId);
-		
+
 			if (friends.Any())
 			{
 				return await friends.ToListAsync();
@@ -89,7 +89,7 @@ namespace NET5ChatAppServerAPI.Controllers
 
 					await this._context.Friends.AddAsync(friend);
 					await this._context.SaveChangesAsync();
-					return Ok();
+					return this.Ok();
 				}
 				catch
 				{
@@ -117,7 +117,7 @@ namespace NET5ChatAppServerAPI.Controllers
 				{
 					this._context.Friends.Remove(await friend.FirstOrDefaultAsync());
 					await this._context.SaveChangesAsync();
-					return Ok();
+					return this.Ok();
 				}
 				catch
 				{

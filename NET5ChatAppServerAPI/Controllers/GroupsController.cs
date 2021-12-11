@@ -82,7 +82,7 @@ namespace NET5ChatAppServerAPI.Controllers
 				Id = Guid.NewGuid(),
 				Name = name
 			};
-			
+
 			try
 			{
 				await this._context.Groups.AddAsync(group);
@@ -116,7 +116,7 @@ namespace NET5ChatAppServerAPI.Controllers
 			var records = this._context.GroupMembers
 				.AsNoTrackingWithIdentityResolution()
 				.Where(o => o.GroupId == groupId)
-				.Select(o=>o.UserId);
+				.Select(o => o.UserId);
 
 			return await records.ToListAsync();
 		}
@@ -219,7 +219,7 @@ namespace NET5ChatAppServerAPI.Controllers
 
 				await this._context.GroupMembers.AddAsync(member);
 				await this._context.SaveChangesAsync();
-				return Ok();
+				return this.Ok();
 			}
 		}
 
@@ -240,7 +240,7 @@ namespace NET5ChatAppServerAPI.Controllers
 			{
 				this._context.GroupMembers.Remove(await member.FirstOrDefaultAsync());
 				await this._context.SaveChangesAsync();
-				return Ok();
+				return this.Ok();
 			}
 			else
 			{
