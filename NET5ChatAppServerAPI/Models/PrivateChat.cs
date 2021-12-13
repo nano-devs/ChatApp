@@ -12,9 +12,16 @@ namespace NET5ChatAppServerAPI.Models
 	/// <typeparam name="T">
 	///		The type used for the primary key for the model.
 	/// </typeparam>
-	public class PrivateChat<T> : BaseModel<T>
-		where T : struct
+	public class PrivateChat<T> where T : struct
 	{
+		/// <summary>
+		///		Universally unique identifier for each records.
+		/// </summary>
+		/// <remarks>
+		///		Primary Key for database table.
+		/// </remarks>
+		public T Id { set; get; }
+
 		/// <summary>
 		///		The user id who send the chat or message.
 		/// </summary>

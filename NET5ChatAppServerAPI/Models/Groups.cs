@@ -8,9 +8,16 @@ namespace NET5ChatAppServerAPI.Models
 	/// <typeparam name="T">
 	///		The type used for the primary key for the model.
 	/// </typeparam>
-	public class Groups<T> : BaseModel<T>
-		where T : struct
+	public class Groups<T> where T : struct
 	{
+		/// <summary>
+		///		Universally unique identifier for each records.
+		/// </summary>
+		/// <remarks>
+		///		Primary Key for database table.
+		/// </remarks>
+		public T Id { set; get; }
+
 		/// <summary>
 		///		Group name.
 		/// </summary>
