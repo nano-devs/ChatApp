@@ -72,8 +72,18 @@ namespace NET5ChatAppServerAPI.Controllers
 			if (records.Any())
 			{
 				var chats = await records.ToListAsync();
-				chats.ForEach(o => o.AlreadySendTo = o.AlreadySendTo + ";" + userId);
+				//chats.ForEach(o => o.AlreadySendTo += ";" + userId);
+				
+				foreach (var chat in chats)
+				{
+					if (!chat.AlreadySendTo.Split(';').Contains(userId.ToString()))
+					{
+						chat.AlreadySendTo += $";{ userId }";
+					}
+				}
+
 				this._context.GroupChats.UpdateRange(chats);
+				await this._context.SaveChangesAsync();
 				return await records.Select(o => new { o.Id, o.From, o.Message, o.Timestamp }).ToListAsync();
 			}
 			else
@@ -108,7 +118,7 @@ namespace NET5ChatAppServerAPI.Controllers
 				foreach (var data in await chats.Select(o => new { o.Id, o.AlreadySendTo }).ToListAsync())
 				{
 					var sended = data.AlreadySendTo.Contains(';');
-					if(sended)
+					if (sended)
 					{
 						var temp = data.AlreadySendTo.Split(';').Select(Guid.Parse).ToList();
 						var isEqual = new HashSet<Guid>(await memberIds).SetEquals(temp);
