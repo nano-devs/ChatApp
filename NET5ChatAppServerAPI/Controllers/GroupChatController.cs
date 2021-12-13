@@ -12,7 +12,9 @@ using NET5ChatAppServerAPI.Models;
 
 namespace NET5ChatAppServerAPI.Controllers
 {
-	public class GroupChatController : BaseApiController
+	[ApiController]
+	[Route("[controller]/[action]")]
+	public class GroupChatController : ControllerBase
 	{
 		private readonly ChatAppDbContext _context;
 
