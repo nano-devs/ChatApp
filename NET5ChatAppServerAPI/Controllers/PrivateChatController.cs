@@ -35,15 +35,28 @@ namespace NET5ChatAppServerAPI.Controllers
 		[HttpPost]
 		public async Task<object> AddChat(Guid userId, Guid friendId, string message)
 		{
+			PrivateChat chat = null;
+			var newId = Guid.Empty;
+
+			while (chat != null)
+			{
+				newId = Guid.NewGuid();
+				chat = await this._context.PrivateChats
+					.AsNoTrackingWithIdentityResolution()
+					.FirstOrDefaultAsync(o => o.Id == newId);
+			}
+
 			try
 			{
-				var chat = new PrivateChat
+				chat = new PrivateChat
 				{
+					Id = newId,
 					From = userId,
 					To = friendId,
 					Message = message,
 					Timestamp = DateTime.UtcNow
 				};
+
 				await this._context.PrivateChats.AddAsync(chat);
 				await this._context.SaveChangesAsync();
 				return "message saved temporary";

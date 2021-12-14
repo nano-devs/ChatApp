@@ -69,19 +69,19 @@ namespace NET5ChatAppServerAPI.Controllers
 		public async Task<Guid> Create(string name, Guid userId)
 		{
 			Groups group = null;
+			var newGroupId = Guid.Empty;
 
-			do
+			while (group != null)
 			{
-				var newGroupId = Guid.NewGuid();
-
+				newGroupId = Guid.NewGuid();
 				group = await this._context.Groups
 					.AsNoTrackingWithIdentityResolution()
-					.FirstOrDefaultAsync(o => o.Id.Equals(newGroupId));
-			} while (group != null);
+					.FirstOrDefaultAsync(o => o.Id == newGroupId);
+			}
 
 			group = new Groups
 			{
-				Id = Guid.NewGuid(),
+				Id = newGroupId,
 				Name = name
 			};
 
