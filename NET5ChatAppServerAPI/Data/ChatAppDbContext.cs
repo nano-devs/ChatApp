@@ -32,6 +32,10 @@ namespace NET5ChatAppServerAPI.Data
 			{
 				entity.HasKey("UserId", "GroupId");
 			});
+			builder.Entity<PendingGroupChat>(entity =>
+			{
+				entity.HasKey("GroupChatId", "UserId");
+			});
 		}
 
 		#region Properties
@@ -39,6 +43,8 @@ namespace NET5ChatAppServerAPI.Data
 		public DbSet<PrivateChat> PrivateChats { set; get; }
 
 		public DbSet<GroupChat> GroupChats { set; get; }
+
+		public DbSet<PendingGroupChat> PendingGroupChats { set; get; }
 
 		public DbSet<Friends> Friends { set; get; }
 

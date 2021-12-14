@@ -43,11 +43,6 @@ namespace NET5ChatAppServerAPI.Models
 		[DataType(DataType.DateTime)]
 		[DisplayFormat(DataFormatString = "dd-MM-yyyy HH:mm:ss")]
 		public DateTime Timestamp { set; get; } = DateTime.UtcNow;
-
-		/// <summary>
-		///		Member id that already receive the message.
-		/// </summary>
-		public string AlreadySendTo { set; get; }
 	}
 
 	/// <summary>
