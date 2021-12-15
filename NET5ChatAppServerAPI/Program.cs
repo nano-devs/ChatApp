@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
@@ -15,7 +14,7 @@ namespace NET5ChatAppServerAPI
 			Host.CreateDefaultBuilder(args)
 				.ConfigureWebHostDefaults(webBuilder =>
 				{
-					
+
 					webBuilder.UseStartup<Startup>();
 				});
 	}
