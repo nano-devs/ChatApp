@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Runtime.ExceptionServices;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 
 using NET5ChatAppServerAPI.Data;
 using NET5ChatAppServerAPI.Models;
@@ -20,6 +17,7 @@ namespace NET5ChatAppServerAPI.Controllers
 	public class GroupChatController : ControllerBase
 	{
 		private readonly ChatAppDbContext _context;
+		private const char _Delimeter = ';';
 
 		public GroupChatController(ChatAppDbContext context)
 		{
@@ -42,14 +40,14 @@ namespace NET5ChatAppServerAPI.Controllers
 			GroupChat groupChat = null;
 			var newGroupChatId = Guid.Empty;
 
-			do
+			while (groupChat != null)
 			{
 				newGroupChatId = Guid.NewGuid();
 
 				groupChat = await this._context.GroupChats
 					.AsNoTrackingWithIdentityResolution()
 					.FirstOrDefaultAsync(o => o.Id == newGroupChatId);
-			} while (groupChat != null);
+			}
 
 			try
 			{
@@ -98,24 +96,14 @@ namespace NET5ChatAppServerAPI.Controllers
 					.Select(o => o.UserId)
 					.ToListAsync();
 
-				var pendingGroupChat = new PendingGroupChat[groupMembers.Count];
-
-				for (var i = 0; i < pendingGroupChat.Length; i++)
-				{
-					pendingGroupChat[i].GroupChatId = groupChatId;
-					pendingGroupChat[i].UserId = groupMembers[i];
-				}
-
-				await this._context.PendingGroupChats.AddRangeAsync(pendingGroupChat);
-				await this._context.SaveChangesAsync();
-				return "message saved temporary";
+				return await this.AddPendingChat(groupChatId, groupMembers.ToArray());
 			}
 			catch
 			{
 				return "Cant store message";
 			}
 		}
-		
+
 		/// <summary>
 		/// Add not received message/chat into PendingGroupChat 
 		/// </summary>
@@ -131,8 +119,11 @@ namespace NET5ChatAppServerAPI.Controllers
 
 				for (var i = 0; i < pendingGroupChat.Length; i++)
 				{
-					pendingGroupChat[i].GroupChatId = groupChatId;
-					pendingGroupChat[i].UserId = userId[i];
+					pendingGroupChat[i] = new PendingGroupChat
+					{
+						GroupChatId = groupChatId,
+						UserId = userId[i]
+					};
 				}
 
 				await this._context.PendingGroupChats.AddRangeAsync(pendingGroupChat);
@@ -154,8 +145,8 @@ namespace NET5ChatAppServerAPI.Controllers
 		[HttpPost]
 		public async Task<object> AddPendingChatV2(Guid groupChatId, string userId)
 		{
-			var ids = userId.Contains(';') ?
-					userId.Split(';').Select(Guid.Parse).ToList() :
+			var ids = userId.Contains(_Delimeter) ?
+					userId.Split(_Delimeter).Select(Guid.Parse).ToList() :
 					new List<Guid> { Guid.Parse(userId) };
 
 			return await this.AddPendingChat(groupChatId, ids.ToArray());
@@ -190,8 +181,8 @@ namespace NET5ChatAppServerAPI.Controllers
 					.ToListAsync();
 
 				var chats = from o in this._context.GroupChats
-							 where pendingChat.Contains(o.Id) && o.GroupId == groupId
-							 select o;
+							where pendingChat.Contains(o.Id) && o.GroupId == groupId
+							select o;
 
 				return await chats.ToListAsync();
 			}
@@ -216,8 +207,11 @@ namespace NET5ChatAppServerAPI.Controllers
 
 				for (var i = 0; i < pendingGroupChat.Length; i++)
 				{
-					pendingGroupChat[i].GroupChatId = groupChatId[i];
-					pendingGroupChat[i].UserId = userId;
+					pendingGroupChat[i] = new PendingGroupChat
+					{
+						GroupChatId = groupChatId[i],
+						UserId = userId
+					};
 				}
 
 				this._context.PendingGroupChats.RemoveRange(pendingGroupChat);
@@ -228,6 +222,22 @@ namespace NET5ChatAppServerAPI.Controllers
 			{
 				return "No pending list to remove";
 			}
+		}
+
+		/// <summary>
+		/// Remove pending list from PendingChatGroup
+		/// </summary>
+		/// <param name="groupChatId"></param>
+		/// <param name="userId">User that not received the message/chat</param>
+		/// <returns></returns>
+		[HttpPost]
+		public async Task<object> RemovePendingChatV2(Guid userId, string groupChatId)
+		{
+			var ids = groupChatId.Contains(_Delimeter) ?
+					   groupChatId.Split(_Delimeter).Select(Guid.Parse).ToList() :
+					   new List<Guid> { Guid.Parse(groupChatId) };
+
+			return await this.RemovePendingChat(userId, ids.ToArray());
 		}
 
 		/// <summary>
