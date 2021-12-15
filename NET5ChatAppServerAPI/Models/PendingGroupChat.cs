@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace NET5ChatAppServerAPI.Models
 {
@@ -16,7 +13,7 @@ namespace NET5ChatAppServerAPI.Models
 		///		Message that not received by group member.
 		/// </summary>
 		public T GroupChatId { set; get; }
-		
+
 		/// <summary>
 		///		User that not received the message.
 		/// </summary>
