@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NET5AuthServerAPI.Models;
 using NET5AuthServerAPI.Models.Requests;
 using NET5AuthServerAPI.Models.Responses;
 using NET5AuthServerAPI.Services.Authenticators;
-using NET5AuthServerAPI.Services.PasswordHashers;
 using NET5AuthServerAPI.Services.RefreshTokenRepositories;
 using NET5AuthServerAPI.Services.TokenValidators;
-using NET5AuthServerAPI.Services.UserRepositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,25 +17,25 @@ namespace NET5AuthServerAPI.Controllers
 {
     public class AuthenticationController : Controller
     {
-        private readonly IUserRepository userRepository;
         private readonly IRefreshTokenRepository refreshTokenRepository;
-        private readonly IPasswordHasher passwordHasher;
-        private readonly Authenticator authenticator;
-
-        // dependency inversion!
         private readonly ITokenValidator refreshTokenValidator;
 
-        public AuthenticationController(IUserRepository userRepository, 
-            IRefreshTokenRepository refreshTokenRepository, 
-            IPasswordHasher passwordHasher, 
-            Authenticator authenticator,
-            ITokenValidator refreshTokenValidator)
+        // dependency inversion!
+        private readonly UserManager<User> userRepository;
+        private readonly Authenticator authenticator;
+        private readonly IdentityErrorDescriber errorDescriber;
+
+        public AuthenticationController(UserManager<User> userRepository, 
+            IRefreshTokenRepository refreshTokenRepository,
+            Authenticator authenticator, 
+            ITokenValidator refreshTokenValidator,
+            IdentityErrorDescriber errorDescriber)
         {
             this.userRepository = userRepository;
             this.refreshTokenRepository = refreshTokenRepository;
-            this.passwordHasher = passwordHasher;
             this.authenticator = authenticator;
             this.refreshTokenValidator = refreshTokenValidator;
+            this.errorDescriber = errorDescriber;
         }
 
         [HttpPost("register")]
@@ -52,27 +51,27 @@ namespace NET5AuthServerAPI.Controllers
                 return BadRequest(new ErrorResponse("Password not match confirm password."));
             }
 
-            User existingUserByEmail = await userRepository.GetByEmail(registerRequest.Email);
-            if (existingUserByEmail != null)
-            {
-                return Conflict(new ErrorResponse("Email already exists."));
-            }
-
-            User existingUserByUsername = await userRepository.GetByUserName(registerRequest.Username);
-            if (existingUserByUsername != null)
-            {
-                return Conflict(new ErrorResponse("Username already exists."));
-            }
-
-            string passwordHash = passwordHasher.HashPassword(registerRequest.Password);
             User registrationUser = new User()
             {
                 Email = registerRequest.Email,
-                Username = registerRequest.Username,
-                PasswordHash = passwordHash,
+                UserName = registerRequest.Username,
             };
 
-            await userRepository.Create(registrationUser);
+            IdentityResult result = await userRepository.CreateAsync(registrationUser, registerRequest.Password);
+
+            if (!result.Succeeded)
+            {
+                IdentityError primaryError = result.Errors.FirstOrDefault();
+
+                if (primaryError.Code == nameof(errorDescriber.DuplicateEmail))
+                {
+                    return Conflict(new ErrorResponse("Email already exists."));
+                }
+                else if (primaryError.Code == nameof(errorDescriber.DuplicateUserName))
+                {
+                    return Conflict(new ErrorResponse("Username already exists."));
+                }
+            }
 
             return Ok();
         }
@@ -85,13 +84,13 @@ namespace NET5AuthServerAPI.Controllers
                 return BadRequestModelState();
             }
 
-            User user = await userRepository.GetByUserName(loginRequest.Username);
+            User user = await userRepository.FindByNameAsync(loginRequest.Username);
             if (user == null)
             {
                 return Unauthorized();
             }
 
-            bool correctPassword =  passwordHasher.VerifyPassword(loginRequest.Password, user.PasswordHash);
+            bool correctPassword =  await userRepository.CheckPasswordAsync(user, loginRequest.Password);
             if (!correctPassword)
             {
                 return Unauthorized();
@@ -125,7 +124,7 @@ namespace NET5AuthServerAPI.Controllers
 
             await refreshTokenRepository.Delete(refreshTokenDTO.Id);
 
-            User user = await userRepository.GetById(refreshTokenDTO.UserId);
+            User user = await userRepository.FindByIdAsync(refreshTokenDTO.UserId.ToString());
             if (user == null)
             {
                 return NotFound(new ErrorResponse("User not found."));
