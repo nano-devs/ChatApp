@@ -26,7 +26,7 @@ namespace NET5AuthServerAPI.Services.TokenGenerators
             {
                 new Claim("id", user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Name, user.UserName),
             };
 
             JwtSecurityToken token = new JwtSecurityToken(
