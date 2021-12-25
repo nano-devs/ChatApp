@@ -1,15 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NET5AuthServerAPI.Models;
 using NET5AuthServerAPI.Models.Requests;
 using NET5AuthServerAPI.Models.Responses;
 using NET5AuthServerAPI.Services.Authenticators;
 using NET5AuthServerAPI.Services.PasswordHashers;
 using NET5AuthServerAPI.Services.RefreshTokenRepositories;
-using NET5AuthServerAPI.Services.TokenGenerators;
 using NET5AuthServerAPI.Services.TokenValidators;
 using NET5AuthServerAPI.Services.UserRepositories;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace NET5AuthServerAPI.Controllers
@@ -132,6 +134,22 @@ namespace NET5AuthServerAPI.Controllers
             AuthenticatedUserResponse response = await authenticator.Authenticate(user);
 
             return Ok(response);
+        }
+
+        [Authorize]
+        [HttpDelete("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            string rawUserId = HttpContext.User.FindFirstValue("id");
+
+            if (!Guid.TryParse(rawUserId, out Guid userId))
+            {
+                return Unauthorized();
+            }
+
+            await refreshTokenRepository.DeleteAll(userId);
+
+            return NoContent();
         }
 
         private IActionResult BadRequestModelState()
