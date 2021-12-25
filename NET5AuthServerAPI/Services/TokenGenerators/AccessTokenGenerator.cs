@@ -7,11 +7,11 @@ using System.Text;
 
 namespace NET5AuthServerAPI.Services.TokenGenerators
 {
-    public class JwtTokenGenerator : ITokenGenerator
+    public class AccessTokenGenerator : ITokenGenerator
     {
         private readonly AuthenticationConfiguration configuration;
 
-        public JwtTokenGenerator(AuthenticationConfiguration configuration)
+        public AccessTokenGenerator(AuthenticationConfiguration configuration)
         {
             this.configuration = configuration;
         }
@@ -26,7 +26,7 @@ namespace NET5AuthServerAPI.Services.TokenGenerators
             {
                 new Claim("id", user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Name, user.UserName),
             };
 
             JwtSecurityToken token = new JwtSecurityToken(
