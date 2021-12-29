@@ -73,6 +73,14 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 ```
 
 ### ASP.NET CORE 6:
+Required dependencies:
+- Microsoft.AspNetCore.Authentication.JwtBearer
+- Microsoft.AspNetCore.Identity.EntityFrameworkCore
+- Microsoft.EntityFrameworkCore
+- Microsoft.EntityFrameworkCore.Sqlite
+- Microsoft.EntityFrameworkCore.Tools
+- System.identityModel.Tokens.Jwt
+
 in **Program.cs**
 ```cs
 app.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(option =>
