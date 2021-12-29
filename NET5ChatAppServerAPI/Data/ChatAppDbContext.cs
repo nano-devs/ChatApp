@@ -1,9 +1,9 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 
-using NET5ChatAppServerAPI.Models;
+using NET6ChatAppServerApi.Models;
 
-namespace NET5ChatAppServerAPI.Data
+namespace NET6ChatAppServerApi.Data
 {
 	public class ChatAppDbContext : DbContext
 	{

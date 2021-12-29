@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NET5ChatAppServerAPI.Models
+namespace NET6ChatAppServerApi.Models
 {
 	/// <summary>
 	///		Available groups.

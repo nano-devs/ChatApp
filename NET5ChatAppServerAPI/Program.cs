@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace NET5ChatAppServerAPI
+namespace NET6ChatAppServerApi
 {
 	public class Program
 	{

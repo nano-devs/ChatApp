@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using NET5ChatAppServerAPI.Data;
+using NET6ChatAppServerApi.Data;
 
-namespace NET5ChatAppServerAPI.Configurations
+namespace NET6ChatAppServerApi.Configurations
 {
 	public static class ConfigureDatabase
 	{

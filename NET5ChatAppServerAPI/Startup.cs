@@ -7,9 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
-using NET5ChatAppServerAPI.Configurations;
+using NET6ChatAppServerApi.Configurations;
 
-namespace NET5ChatAppServerAPI
+namespace NET6ChatAppServerApi
 {
 	public class Startup
 	{

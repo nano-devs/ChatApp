@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NET5ChatAppServerAPI.Models
+namespace NET6ChatAppServerApi.Models
 {
 	/// <summary>
 	/// Store the Group chat message id and user id that 

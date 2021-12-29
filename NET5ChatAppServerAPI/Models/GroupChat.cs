@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace NET5ChatAppServerAPI.Models
+namespace NET6ChatAppServerApi.Models
 {
 	/// <summary>
 	///		Temporary store chat that can't directly send to group.
