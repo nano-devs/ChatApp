@@ -37,11 +37,12 @@ builder.WebHost.ConfigureKestrel(o =>
 	//	};
 	//});
 });
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
-builder.Services.AddTransient<IFriendsRepository, FriendsRepository>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IFriendsRepository, FriendsRepository>();
 
 builder.Services.AddSwaggerGen(c =>
 {
