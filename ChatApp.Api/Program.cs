@@ -1,47 +1,48 @@
 global using System;
 
-using ChatApp.API.Configurations;
+using ChatApp.Api.Repositories;
+using ChatApp.API.Data;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// TODO: remove kestrel server header
-//builder.Host.ConfigureWebHost(
-//	host =>
-//	{
-//		host.ConfigureKestrel(o =>
-//		{
-//			o.AddServerHeader = false;
-//			//o.ConfigureEndpointDefaults(listenOptions =>
-//			//{
-//			//	listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
-//			//});
-//			//o.ConfigureHttpsDefaults(listenOptions =>
-//			//{
-//			//	listenOptions.SslProtocols = SslProtocols.Tls13 | SslProtocols.Tls12;
-//			//	listenOptions.OnAuthenticate = (context, sslOptions) =>
-//			//	{
-//			//		sslOptions.EnabledSslProtocols = SslProtocols.Tls13 | SslProtocols.Tls12;
-//			//		if (sslOptions.ApplicationProtocols != null)
-//			//		{
-//			//			sslOptions.ApplicationProtocols.Clear();
-//			//		}
-//			//		else
-//			//		{
-//			//			sslOptions.ApplicationProtocols = new();
-//			//		}
+// TODO: configure tls/ssl and http protocol
+builder.WebHost.ConfigureKestrel(o =>
+{
+	o.AddServerHeader = false;
+	//o.ConfigureEndpointDefaults(listenOptions =>
+	//{
+	//	listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+	//});
+	//o.ConfigureHttpsDefaults(listenOptions =>
+	//{
+	//	listenOptions.SslProtocols = SslProtocols.Tls13 | SslProtocols.Tls12;
+	//	listenOptions.OnAuthenticate = (context, sslOptions) =>
+	//	{
+	//		sslOptions.EnabledSslProtocols = SslProtocols.Tls13 | SslProtocols.Tls12;
+	//		if (sslOptions.ApplicationProtocols != null)
+	//		{
+	//			sslOptions.ApplicationProtocols.Clear();
+	//		}
+	//		else
+	//		{
+	//			sslOptions.ApplicationProtocols = new();
+	//		}
 
-//			//		sslOptions.ApplicationProtocols.Add(SslApplicationProtocol.Http2);
-//			//		sslOptions.ApplicationProtocols.Add(SslApplicationProtocol.Http11);
-//			//	};
-//			//});
-//		});
-//	});
-
+	//		sslOptions.ApplicationProtocols.Add(SslApplicationProtocol.Http2);
+	//		sslOptions.ApplicationProtocols.Add(SslApplicationProtocol.Http11);
+	//	};
+	//});
+});
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddTransient<IFriendsRepository, FriendsRepository>();
+
 builder.Services.AddSwaggerGen(c =>
 {
 	c.SwaggerDoc("v1", new OpenApiInfo { Title = "ChatApp.API", Version = "v1" });
@@ -63,7 +64,20 @@ builder.Services.Configure<JsonOptions>(options =>
 	}
 	options.JsonSerializerOptions.AllowTrailingCommas = true;
 });
-builder.Services.AddDatabase(builder.Configuration, builder.Environment.IsDevelopment());
+builder.Services.AddDbContext<ChatAppDbContext>(options =>
+{
+	if (builder.Environment.IsDevelopment())
+	{
+		options.UseSqlite(
+				builder.Configuration.GetConnectionString("DataSQLiteConnection"));
+	}
+	else
+	{
+		//options.UseNpgsql(
+		//	builder.Configuration.GetConnectionString("DataPostgreConnection"),
+		//	options => { options.EnableRetryOnFailure(5, TimeSpan.FromSeconds(30), null); });
+	}
+});
 
 var app = builder.Build();
 
@@ -89,6 +103,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
 	name: "default",
-	pattern: "{controller=Home}/{action=Index}/{id?}");
+	pattern: "{controller=swagger}/{action=Index}/{id?}");
 
 app.Run();
