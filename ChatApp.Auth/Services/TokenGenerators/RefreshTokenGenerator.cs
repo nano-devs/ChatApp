@@ -17,10 +17,8 @@ public class RefreshTokenGenerator : ITokenGenerator
 
     public string GenerateToken(User user)
     {
-        // redundant code
-
         // key used to sign jwt is gonna be the same as the key used for verify jwt
-        SecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.RefreshTokenSecret));
+        SecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.RefreshTokenSecret!));
         SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         JwtSecurityToken token = new JwtSecurityToken(

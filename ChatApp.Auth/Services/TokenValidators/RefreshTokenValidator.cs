@@ -7,28 +7,17 @@ using System.Text;
 
 public class RefreshTokenValidator : ITokenValidator
 {
-    private readonly AuthenticationConfiguration configuration;
+    private readonly TokenValidationParameters validationParameters;
+    private readonly JwtSecurityTokenHandler tokenHandler;
 
-    public RefreshTokenValidator(AuthenticationConfiguration configuration)
+    public RefreshTokenValidator(TokenValidationParameters validationParameters, JwtSecurityTokenHandler tokenHandler)
     {
-        this.configuration = configuration;
+        this.validationParameters = validationParameters;
+        this.tokenHandler = tokenHandler;
     }
 
     public bool Validate(string token)
     {
-        TokenValidationParameters validationParameters = new TokenValidationParameters()
-        {
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.RefreshTokenSecret)),
-            ValidIssuer = configuration.Issuer,
-            ValidAudience = configuration.Audience,
-            ValidateIssuerSigningKey = true,
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ClockSkew = System.TimeSpan.Zero,
-        };
-
-        JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-
         try
         {
             tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);

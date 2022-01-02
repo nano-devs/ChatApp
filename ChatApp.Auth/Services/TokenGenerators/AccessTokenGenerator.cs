@@ -19,8 +19,7 @@ public class AccessTokenGenerator : ITokenGenerator
 
     public string GenerateToken(User user)
     {
-        // key used to sign jwt is gonna be the same as the key used for verify jwt
-        SecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.AccessTokenSecret));
+        SecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.AccessTokenSecret!));
         SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         List<Claim> claims = new List<Claim>()
@@ -31,12 +30,13 @@ public class AccessTokenGenerator : ITokenGenerator
         };
 
         JwtSecurityToken token = new JwtSecurityToken(
-            configuration.Issuer, // issuer domain
-            configuration.Audience, // audience
+            configuration.Issuer,
+            configuration.Audience,
             claims,
-            DateTime.UtcNow, // token valid datetime
-            DateTime.UtcNow.AddMinutes(configuration.AccessTokenExpirationMinutes), // token expired datetime
-            credentials);
+            DateTime.UtcNow,
+            DateTime.UtcNow.AddMinutes(configuration.AccessTokenExpirationMinutes),
+            credentials
+        );
 
         // get the string of jwt token
         return new JwtSecurityTokenHandler().WriteToken(token);
