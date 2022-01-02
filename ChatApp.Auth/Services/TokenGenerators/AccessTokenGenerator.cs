@@ -1,12 +1,12 @@
 ﻿namespace ChatApp.Auth.Services.TokenGenerators;
 
-using Microsoft.IdentityModel.Tokens;
 using ChatApp.Auth.Models;
+using ChatApp.Auth.Models.Configurations;
+using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using ChatApp.Auth.Models.Configurations;
 
 public class AccessTokenGenerator : ITokenGenerator
 {
