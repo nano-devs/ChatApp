@@ -1,8 +1,8 @@
-﻿namespace ChatApp.API.Controllers;
+﻿namespace ChatApp.Api.Controllers;
 
 using ChatApp.Api.Repositories;
-using ChatApp.API.Data;
-using ChatApp.API.Models;
+using ChatApp.Api.Data;
+using ChatApp.Api.Models;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +15,7 @@ public class FriendsController : ControllerBase
 
 	public FriendsController(ChatAppDbContext context)
 	{
-		this._context = context; 
+		this._context = context;
 	}
 
 	/// <summary>

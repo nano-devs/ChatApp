@@ -1,9 +1,9 @@
-﻿namespace ChatApp.API.Controllers;
+﻿namespace ChatApp.Api.Controllers;
 
 using System.Data;
 
-using ChatApp.API.Data;
-using ChatApp.API.Models;
+using ChatApp.Api.Data;
+using ChatApp.Api.Models;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

@@ -1,7 +1,7 @@
 global using System;
 
 using ChatApp.Api.Repositories;
-using ChatApp.API.Data;
+using ChatApp.Api.Data;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

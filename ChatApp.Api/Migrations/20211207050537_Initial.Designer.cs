@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using ChatApp.API.Data;
+using ChatApp.Api.Data;
 
-namespace ChatApp.API.Migrations
+namespace ChatApp.Api.Migrations
 {
     [DbContext(typeof(ChatAppDbContext))]
     [Migration("20211207050537_Initial")]

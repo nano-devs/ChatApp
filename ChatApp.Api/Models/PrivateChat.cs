@@ -1,4 +1,4 @@
-﻿namespace ChatApp.API.Models;
+﻿namespace ChatApp.Api.Models;
 
 using System.ComponentModel.DataAnnotations;
 

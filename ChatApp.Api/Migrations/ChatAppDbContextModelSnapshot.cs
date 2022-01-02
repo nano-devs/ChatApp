@@ -1,6 +1,6 @@
-﻿namespace ChatApp.API.Migrations;
+﻿namespace ChatApp.Api.Migrations;
 
-using ChatApp.API.Data;
+using ChatApp.Api.Data;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;

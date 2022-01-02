@@ -1,6 +1,6 @@
-﻿namespace ChatApp.API.Data;
+﻿namespace ChatApp.Api.Data;
 
-using ChatApp.API.Models;
+using ChatApp.Api.Models;
 
 using Microsoft.EntityFrameworkCore;
 

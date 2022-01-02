@@ -1,4 +1,4 @@
-﻿namespace ChatApp.API.Models;
+﻿namespace ChatApp.Api.Models;
 
 /// <summary>
 /// Store the Group chat message id and user id that 

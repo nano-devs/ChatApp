@@ -1,4 +1,4 @@
-﻿namespace ChatApp.API.Migrations;
+﻿namespace ChatApp.Api.Migrations;
 
 using Microsoft.EntityFrameworkCore.Migrations;
 
