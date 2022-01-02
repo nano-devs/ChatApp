@@ -31,15 +31,6 @@ public class FriendsController : ControllerBase
 		}
 
 		return "no friends exist in database";
-		//var records = from o in this._context.Friends
-		//			  select o;
-
-		//if (records.Any() == false)
-		//{
-		//	return "no friends exist in database";
-		//}
-
-		//return await records.AsNoTrackingWithIdentityResolution().ToListAsync();
 	}
 
 	/// <summary>
