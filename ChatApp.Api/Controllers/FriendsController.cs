@@ -1,10 +1,11 @@
-﻿using ChatApp.API.Data;
+﻿namespace ChatApp.API.Controllers;
+
+using ChatApp.Api.Repositories;
+using ChatApp.API.Data;
 using ChatApp.API.Models;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-namespace ChatApp.API.Controllers;
 
 [ApiController]
 [Route("[controller]/[action]")]
@@ -14,7 +15,7 @@ public class FriendsController : ControllerBase
 
 	public FriendsController(ChatAppDbContext context)
 	{
-		this._context = context;
+		this._context = context; 
 	}
 
 	/// <summary>

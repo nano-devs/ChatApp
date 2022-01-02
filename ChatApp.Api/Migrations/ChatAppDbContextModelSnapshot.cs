@@ -1,9 +1,9 @@
-﻿using ChatApp.API.Data;
+﻿namespace ChatApp.API.Migrations;
+
+using ChatApp.API.Data;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-
-namespace ChatApp.API.Migrations;
 
 [DbContext(typeof(ChatAppDbContext))]
 partial class ChatAppDbContextModelSnapshot : ModelSnapshot

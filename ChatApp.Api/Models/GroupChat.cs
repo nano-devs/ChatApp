@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace ChatApp.API.Models;
 
-namespace ChatApp.API.Models;
+using System.ComponentModel.DataAnnotations;
 
 /// <summary>
 ///		Temporary store chat that can't directly send to group.

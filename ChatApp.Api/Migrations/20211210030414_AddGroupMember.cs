@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿namespace ChatApp.API.Migrations;
 
-namespace ChatApp.API.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 public partial class AddGroupMember : Migration
 {
