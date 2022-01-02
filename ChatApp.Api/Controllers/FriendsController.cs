@@ -1,21 +1,19 @@
 ﻿namespace ChatApp.Api.Controllers;
 
-using ChatApp.Api.Repositories;
 using ChatApp.Api.Data;
-using ChatApp.Api.Models;
+using ChatApp.Api.Services.Repositories;
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 [ApiController]
 [Route("[controller]/[action]")]
 public class FriendsController : ControllerBase
 {
-	private readonly ChatAppDbContext _context;
+	protected IFriendsRepository _friendsRepository;
 
-	public FriendsController(ChatAppDbContext context)
+	public FriendsController(IFriendsRepository friendsRepository)
 	{
-		this._context = context;
+		this._friendsRepository = friendsRepository;
 	}
 
 	/// <summary>
@@ -25,15 +23,23 @@ public class FriendsController : ControllerBase
 	[HttpGet]
 	public async Task<object> Index()
 	{
-		var records = from o in this._context.Friends
-					  select o;
+		var friends = await this._friendsRepository.GetAllAsync();
 
-		if (records.Any() == false)
+		if (friends.Any())
 		{
-			return "no friends exist in database";
+			return friends;
 		}
 
-		return await records.AsNoTrackingWithIdentityResolution().ToListAsync();
+		return "no friends exist in database";
+		//var records = from o in this._context.Friends
+		//			  select o;
+
+		//if (records.Any() == false)
+		//{
+		//	return "no friends exist in database";
+		//}
+
+		//return await records.AsNoTrackingWithIdentityResolution().ToListAsync();
 	}
 
 	/// <summary>
@@ -44,19 +50,16 @@ public class FriendsController : ControllerBase
 	[HttpGet]
 	public async Task<object> MyFriends(Guid userId)
 	{
-		if (this._context.Friends is null)
+		if (this._friendsRepository is null)
 		{
 			return "Friends context is null";
 		}
 
-		var friends = this._context.Friends
-			.AsNoTrackingWithIdentityResolution()
-			.Where(o => o.UserId == userId)
-			.Select(o => o.FriendId);
+		var friends = this._friendsRepository.GetFriends(userId);
 
 		if (friends.Any())
 		{
-			return await friends.ToListAsync();
+			return friends;
 		}
 		else
 		{
@@ -73,37 +76,30 @@ public class FriendsController : ControllerBase
 	[HttpPost]
 	public async Task<object> AddFriend(Guid userId, Guid friendId)
 	{
-		if (this._context.Friends is null)
+		if (this._friendsRepository is null)
 		{
 			return "Friends context is null";
 		}
 
-		var exist = this._context.Friends
-			.AsNoTrackingWithIdentityResolution()
-			.Where(o => o.UserId == userId && o.FriendId == friendId);
-
-		if (exist.Any())
+		if (this._friendsRepository.IsFriendExist(userId, friendId))
 		{
 			return $"{ userId } already a friend { friendId }";
 		}
-		else
-		{
-			try
-			{
-				var friend = new Friends
-				{
-					UserId = userId,
-					FriendId = friendId
-				};
 
-				await this._context.Friends.AddAsync(friend);
-				await this._context.SaveChangesAsync();
+		try
+		{
+			var success = await this._friendsRepository.AddFriendshipAsync(userId, friendId);
+			if (success)
+			{
+				await this._friendsRepository.SaveAsync();
 				return this.Ok();
 			}
-			catch
-			{
-				return "Failed to add { friendId } to { userId }";
-			}
+
+			return "Failed to add { friendId } for { userId }";
+		}
+		catch
+		{
+			return "Failed to add { friendId } for { userId }";
 		}
 	}
 
@@ -116,31 +112,31 @@ public class FriendsController : ControllerBase
 	[HttpPost]
 	public async Task<object> RemoveFriend(Guid userId, Guid friendId)
 	{
-		if (this._context.Friends is null)
+		if (this._friendsRepository is null)
 		{
 			return "Friends context is null";
 		}
 
-		var friend = this._context.Friends
-			.AsNoTrackingWithIdentityResolution()
-			.Where(o => o.UserId == userId && o.FriendId == friendId);
-
-		if (friend.Any())
-		{
-			try
-			{
-				this._context.Friends.Remove(await friend.FirstAsync());
-				await this._context.SaveChangesAsync();
-				return this.Ok();
-			}
-			catch
-			{
-				return $"Failed to remove friend ({ friend }) from user ({ friendId })";
-			}
-		}
-		else
+		if (!this._friendsRepository.IsFriendExist(userId, friendId))
 		{
 			return $"{ userId } do not have a friend { friendId }";
+
+		}
+
+		try
+		{
+			var success = await this._friendsRepository.RemoveFriendshipAsync(userId, friendId);
+			if (success)
+			{
+				await this._friendsRepository.SaveAsync();
+				return this.Ok();
+			}
+
+			return $"Failed to remove friend ({ friendId }) from user ({ userId })";
+		}
+		catch
+		{
+			return $"Failed to remove friend ({ friendId }) from user ({ userId })";
 		}
 	}
 }
