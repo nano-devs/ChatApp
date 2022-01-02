@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿namespace ChatApp.Auth.Models; 
 
-namespace ChatApp.Auth.Models;
+using Microsoft.AspNetCore.Identity;
 
 public class User : IdentityUser<Guid>
 {
