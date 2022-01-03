@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("[controller]/[action]")]
-public class FriendsController : ControllerBase
+public class FriendController : ControllerBase
 {
 	protected IFriendsRepository _friendsRepository;
 
-	public FriendsController(IFriendsRepository friendsRepository)
+	public FriendController(IFriendsRepository friendsRepository)
 	{
 		this._friendsRepository = friendsRepository;
 	}

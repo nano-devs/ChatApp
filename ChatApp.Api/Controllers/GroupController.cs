@@ -2,19 +2,20 @@
 
 using ChatApp.Api.Data;
 using ChatApp.Api.Models;
+using ChatApp.Api.Services.Repositories;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 [ApiController]
 [Route("[controller]/[action]")]
-public class GroupsController : ControllerBase
+public class GroupController : ControllerBase
 {
-	private readonly ChatAppDbContext _context;
+	protected IGroupsRepository _groupsRepository;
 
-	public GroupsController(ChatAppDbContext context)
+	public GroupController(IGroupsRepository groupsRepository)
 	{
-		this._context = context;
+		this._groupsRepository = groupsRepository;
 	}
 
 	/// <summary>
@@ -24,15 +25,14 @@ public class GroupsController : ControllerBase
 	[HttpGet]
 	public async Task<object> Index()
 	{
-		var records = from o in this._context.Groups
-					  select new { o.Id, o.Name };
+		var groups = await this._groupsRepository.GetAllAsync();
 
-		if (records.Any() == false)
+		if (groups.Any())
 		{
-			return "not found";
+			return groups;
 		}
 
-		return await records.AsNoTrackingWithIdentityResolution().ToListAsync();
+		return "Theres no groups available in database";
 	}
 
 	/// <summary>
@@ -43,14 +43,12 @@ public class GroupsController : ControllerBase
 	[HttpGet]
 	public async Task<object> Details(Guid groupId)
 	{
-		if (this._context.Groups is null)
+		if (this._groupsRepository is null)
 		{
 			return "Group context is null";
 		}
 
-		var group = await this._context.Groups
-			.AsNoTrackingWithIdentityResolution()
-			.FirstOrDefaultAsync(m => m.Id == groupId);
+		var group = await this._groupsRepository.GetByIdAsync<Guid>(groupId);
 
 		if (group == null)
 		{
@@ -69,12 +67,7 @@ public class GroupsController : ControllerBase
 	[HttpPost]
 	public async Task<Guid> Create(string name, Guid userId)
 	{
-		if (this._context.Groups is null)
-		{
-			return Guid.Empty;
-		}
-
-		if (this._context.GroupMembers is null)
+		if (this._groupsRepository is null)
 		{
 			return Guid.Empty;
 		}
@@ -85,32 +78,23 @@ public class GroupsController : ControllerBase
 		while (group != null)
 		{
 			newGroupId = Guid.NewGuid();
-			group = await this._context.Groups
-				.AsNoTrackingWithIdentityResolution()
-				.FirstOrDefaultAsync(o => o.Id == newGroupId);
+			group = await this._groupsRepository.GetByIdAsync<Guid>(newGroupId);
 		}
-
-		group = new Groups
-		{
-			Id = newGroupId,
-			Name = name
-		};
 
 		try
 		{
-			await this._context.Groups.AddAsync(group);
+			var success = await this._groupsRepository.
+				CreateGroupAsync(
+					new Groups() { Id = newGroupId, Name = name },
+					new GroupMember() { GroupId = newGroupId, UserId = userId });
 
-			// create GroupMember after adding into database
-			// to minimize concurency conflict for creating new Group
-			var member = new GroupMember
+			if (success)
 			{
-				GroupId = group.Id,
-				UserId = userId
-			};
+				await this._groupsRepository.SaveAsync();
+				return newGroupId;
+			}
 
-			await this._context.GroupMembers.AddAsync(member);
-			await this._context.SaveChangesAsync();
-			return group.Id;
+			return Guid.Empty;
 		}
 		catch
 		{
@@ -126,17 +110,19 @@ public class GroupsController : ControllerBase
 	[HttpGet]
 	public async Task<object> GetGroupMember(Guid groupId)
 	{
-		if (this._context.GroupMembers is null)
+		if (this._groupsRepository is null)
 		{
 			return "Group Members context is null";
 		}
 
-		var records = this._context.GroupMembers
-			.AsNoTrackingWithIdentityResolution()
-			.Where(o => o.GroupId == groupId)
-			.Select(o => o.UserId);
+		var groupMembers = this._groupsRepository.GetGroupMembers(groupId);
 
-		return await records.ToListAsync();
+		if (groupMembers.Any())
+		{
+			return groupMembers;
+		}
+
+		return $"No member in { groupId }";
 	}
 
 	[HttpPost]
@@ -154,32 +140,28 @@ public class GroupsController : ControllerBase
 	[HttpPost]
 	public async Task<object> ChangeName(Guid groupId, string name)
 	{
-		if (this._context.Groups is null)
+		if (this._groupsRepository is null)
 		{
 			return "Group context is null";
 		}
 
-		var group = await this._context.Groups
-			.AsNoTrackingWithIdentityResolution()
-			.FirstOrDefaultAsync(o => o.Id == groupId);
+		var group = await this._groupsRepository.GetByIdAsync<Guid>(groupId);
 
-		if (group != null)
-		{
-			try
-			{
-				group.Name = name;
-				this._context.Groups.Update(group);
-				await this._context.SaveChangesAsync();
-				return this.Ok();
-			}
-			catch
-			{
-				return "Failed to change group name";
-			}
-		}
-		else
+		if (group == null)
 		{
 			return this.NotFound();
+		}
+
+		try
+		{
+			group.Name = name;
+			await this._groupsRepository.UpdateAsync(group);
+			await this._groupsRepository.SaveAsync();
+			return this.Ok();
+		}
+		catch
+		{
+			return "Failed to change group name";
 		}
 	}
 
@@ -192,31 +174,27 @@ public class GroupsController : ControllerBase
 	[HttpPost]
 	public async Task<object> Delete(Guid groupId)
 	{
-		if (this._context.Groups is null)
+		if (this._groupsRepository is null)
 		{
 			return "Group context is null";
 		}
 
-		var group = await this._context.Groups
-			.AsNoTrackingWithIdentityResolution()
-			.FirstOrDefaultAsync(o => o.Id == groupId);
+		var group = await this._groupsRepository.GetByIdAsync<Guid>(groupId);
 
-		if (group != null)
-		{
-			try
-			{
-				this._context.Remove(group);
-				await this._context.SaveChangesAsync();
-				return groupId;
-			}
-			catch
-			{
-				return "Failed to delete group";
-			}
-		}
-		else
+		if (group == null)
 		{
 			return this.NotFound();
+		}
+
+		try
+		{
+			await this._groupsRepository.RemoveAsync(group);
+			await this._groupsRepository.SaveAsync();		
+			return groupId;
+		}
+		catch
+		{
+			return "Failed to delete group";
 		}
 	}
 
@@ -229,31 +207,22 @@ public class GroupsController : ControllerBase
 	[HttpPost]
 	public async Task<object> AddMember(Guid groupId, Guid userId)
 	{
-		if (this._context.GroupMembers is null)
+		if (this._groupsRepository is null)
 		{
 			return "Group Members context is null";
 		}
 
-		var exist = this._context.GroupMembers
-			.AsNoTrackingWithIdentityResolution()
-			.Where(o => o.GroupId == groupId && o.UserId == userId);
+		var exist = await this._groupsRepository.IsMemberExist(groupId, userId);
 
-		if (exist.Any())
+		if (exist)
 		{
 			return $"{ userId } already a member of group { groupId }";
 		}
-		else
-		{
-			var member = new GroupMember
-			{
-				GroupId = groupId,
-				UserId = userId
-			};
 
-			await this._context.GroupMembers.AddAsync(member);
-			await this._context.SaveChangesAsync();
-			return this.Ok();
-		}
+		await this._groupsRepository.AddMemberAsync(groupId, userId);
+		await this._groupsRepository.SaveAsync();
+
+		return this.Ok();
 	}
 
 	/// <summary>
@@ -265,14 +234,25 @@ public class GroupsController : ControllerBase
 	[HttpPost]
 	public async Task<object> RemoveMember(Guid groupId, Guid userId)
 	{
-		if (this._context.GroupMembers is null)
+		if (this._groupsRepository is null)
 		{
 			return "Group Members context is null";
 		}
 
+		var exist = await this._groupsRepository.IsMemberExist(groupId, userId);
+
+		if (exist)
+		{
+			return $"{ userId } already a member of group { groupId }";
+		}
+
+		await this._groupsRepository.(groupId, userId);
+		await this._groupsRepository.SaveAsync();
+
+		return this.Ok();
 		var member = this._context.GroupMembers
-						.AsNoTrackingWithIdentityResolution()
-						.Where(o => o.GroupId == groupId && o.UserId == userId);
+					.AsNoTrackingWithIdentityResolution()
+					.Where(o => o.GroupId == groupId && o.UserId == userId);
 
 		if (member.Any())
 		{
