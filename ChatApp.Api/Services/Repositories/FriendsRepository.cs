@@ -9,14 +9,21 @@ using Microsoft.EntityFrameworkCore;
 
 public class FriendsRepository : Repository<Friends>, IFriendsRepository
 {
+	protected DbSet<Friends> _friends;
+
 	public FriendsRepository(ChatAppDbContext context) : base(context)
 	{
-		
+		if (context.Friends is null)
+		{
+			throw new NullReferenceException("Friends context is null");
+		}
+
+		this._friends = context.Friends;
 	}
 
 	public IEnumerable<Guid> GetFriends(Guid userId)
 	{
-		return this._context.Friends
+		return this._friends
 			.AsNoTrackingWithIdentityResolution()
 			.Where(o => o.UserId == userId)
 			.Select(o => o.FriendId);
@@ -24,7 +31,7 @@ public class FriendsRepository : Repository<Friends>, IFriendsRepository
 
 	public bool IsFriendExist(Guid userId, Guid friendId)
 	{
-		var friends = this._context.Friends
+		var friends = this._friends
 			.AsNoTrackingWithIdentityResolution()
 			.Where(o => o.UserId == userId && o.FriendId == friendId);
 
@@ -56,9 +63,9 @@ public class FriendsRepository : Repository<Friends>, IFriendsRepository
 			await this.AddAsync(friend2);
 			return true;
 		}
-		catch
+		catch (Exception)
 		{
-			return false;
+			throw;
 		}
 	}
 
@@ -81,9 +88,9 @@ public class FriendsRepository : Repository<Friends>, IFriendsRepository
 			await this.RemoveAsync(friend2);
 			return true;
 		}
-		catch
+		catch (Exception)
 		{
-			return false;
+			throw;
 		}
 	}
 }
