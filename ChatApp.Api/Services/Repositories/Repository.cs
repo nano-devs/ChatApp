@@ -15,12 +15,12 @@ public class Repository<T> : IRepository<T> where T : class
 		this._context = context;
 	}
 
-	public T? GetById<TKey>(TKey id) where TKey : struct
+	public virtual T? GetById(Guid id)
 	{
 		return this._context.Set<T>().Find(id);
 	}
 
-	public async Task<T?> GetByIdAsync<TKey>(TKey? id) where TKey : struct
+	public virtual async Task<T?> GetByIdAsync(Guid? id)
 	{
 		if (id == null)
 		{
@@ -43,13 +43,13 @@ public class Repository<T> : IRepository<T> where T : class
 			.ToListAsync();
 	}
 
-	public IEnumerable<T> Find(Expression<Func<T, bool>> expression)
+	public virtual IEnumerable<T> Find(Expression<Func<T, bool>> expression)
 	{
 		return this._context.Set<T>().Where(expression)
 			.AsNoTrackingWithIdentityResolution();
 	}
 
-	public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> expression)
+	public virtual async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> expression)
 	{
 		return await this._context.Set<T>().Where(expression)
 			.AsNoTrackingWithIdentityResolution()

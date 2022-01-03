@@ -4,9 +4,9 @@ using System.Linq.Expressions;
 
 public interface IRepository<T> where T : class
 {
-    T? GetById<TKey>(TKey id) where TKey : struct;
+    T? GetById(Guid id);
 
-    Task<T?> GetByIdAsync<TKey>(TKey? id) where TKey : struct;
+    Task<T?> GetByIdAsync(Guid id);
 
     IEnumerable<T> GetAll();
 
