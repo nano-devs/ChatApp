@@ -12,6 +12,11 @@ public class Repository<T> : IRepository<T> where T : class
 
 	public Repository(ChatAppDbContext context)
 	{
+		if (context is null)
+		{
+			throw new NullReferenceException("context");
+		}
+
 		this._context = context;
 	}
 
