@@ -9,12 +9,12 @@ using Microsoft.AspNetCore.Mvc;
 [Route("[controller]/[action]")]
 public class GroupController : ControllerBase
 {
-	protected GroupsRepository _groupsRepository;
+	protected IRepository<Group<Guid>> _groupsRepository;
 	protected IGroupMembersRepository _groupMembersRepository;
 
 	public GroupController(GroupsRepository groupsRepository, IGroupMembersRepository groupMembersRepository)
 	{
-		this._groupsRepository = groupsRepository;
+		this._groupsRepository = (IRepository<Group<Guid>>)groupsRepository;
 		this._groupMembersRepository = groupMembersRepository;
 	}
 
