@@ -4,7 +4,6 @@ using ChatApp.Api.Models;
 using ChatApp.Api.Services.Repositories;
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 [ApiController]
 [Route("[controller]/[action]")]
@@ -81,10 +80,10 @@ public class GroupController : ControllerBase
 		{
 			await this._groupsRepository.AddAsync(
 				new Groups() { Id = newGroupId, Name = name });
-			
+
 			await this._groupMembersRepository.AddAsync(
 				new GroupMember() { GroupId = newGroupId, UserId = userId });
-			
+
 			await this._groupsRepository.SaveAsync();
 
 			return newGroupId;

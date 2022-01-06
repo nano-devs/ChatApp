@@ -1,20 +1,15 @@
 ﻿namespace ChatApp.Api.Controllers;
-
-using System.Data;
-
-using ChatApp.Api.Data;
 using ChatApp.Api.Models;
 using ChatApp.Api.Services.Repositories;
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 [ApiController]
 [Route("[controller]/[action]")]
 public class PrivateChatController : ControllerBase
 {
 	protected IPrivateChatsRepository _privateChatRepository;
-	
+
 	public PrivateChatController(IPrivateChatsRepository privateChatRepository)
 	{
 		this._privateChatRepository = privateChatRepository;

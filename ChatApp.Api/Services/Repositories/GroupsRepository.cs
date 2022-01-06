@@ -1,7 +1,5 @@
 ﻿namespace ChatApp.Api.Services.Repositories;
 
-using System.Collections.Generic;
-
 using ChatApp.Api.Data;
 using ChatApp.Api.Models;
 

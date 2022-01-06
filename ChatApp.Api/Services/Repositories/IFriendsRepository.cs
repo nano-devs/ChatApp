@@ -11,5 +11,5 @@ public interface IFriendsRepository : IRepository<Friends>
 	Task<bool> AddFriendshipAsync(Guid userId, Guid friendId);
 
 	Task<bool> RemoveFriendshipAsync(Guid userId, Guid friendId);
-	
+
 }

@@ -1,6 +1,4 @@
 ﻿namespace ChatApp.Api.Controllers;
-
-using ChatApp.Api.Data;
 using ChatApp.Api.Services.Repositories;
 
 using Microsoft.AspNetCore.Mvc;
@@ -108,7 +106,7 @@ public class FriendController : ControllerBase
 			return "Friends context is null";
 		}
 
-		if (! await this._friendsRepository.IsFriendExistAsync(userId, friendId))
+		if (!await this._friendsRepository.IsFriendExistAsync(userId, friendId))
 		{
 			return $"{ userId } do not have a friend { friendId }";
 

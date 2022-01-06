@@ -2,12 +2,10 @@
 
 using System.Data;
 
-using ChatApp.Api.Data;
 using ChatApp.Api.Models;
 using ChatApp.Api.Services.Repositories;
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 [ApiController]
 [Route("[controller]/[action]")]
@@ -92,7 +90,7 @@ public class GroupChatController : ControllerBase
 
 			var groupMembers = (IList<Guid>)await this._groupMembersRepository
 				.GetGroupMembersAsync(groupId);
-			
+
 			groupMembers.Remove(userId);
 
 			return await this.AddPendingChat(groupChatId, groupMembers);
@@ -118,7 +116,7 @@ public class GroupChatController : ControllerBase
 
 		return await this.AddPendingChat(groupChatId, ids);
 	}
-	
+
 	/// <summary>
 	/// Add not received message/chat into PendingGroupChat 
 	/// </summary>
@@ -177,7 +175,7 @@ public class GroupChatController : ControllerBase
 
 			var chats = await this._groupChatRepository
 				.GetGroupChatThatPendingAsync(groupId, pendingChatIds);
-			
+
 			if (chats.Any())
 			{
 				return chats;
@@ -256,9 +254,9 @@ public class GroupChatController : ControllerBase
 		// TODO: simplified version for delete group chat
 
 		// get chat list from group
-		
+
 		var chats = await this._groupChatRepository.
-			FindAsync(o=>o.Id == groupId);
+			FindAsync(o => o.Id == groupId);
 
 		//var chats = await this._context.GroupChats
 		//	.AsNoTrackingWithIdentityResolution()
