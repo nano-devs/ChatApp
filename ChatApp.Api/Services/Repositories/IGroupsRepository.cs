@@ -2,7 +2,7 @@
 
 using ChatApp.Api.Models;
 
-public interface IGroupsRepository : IRepository<Groups>
+public interface IGroupsRepository : IRepository<Group>
 {
 
 }

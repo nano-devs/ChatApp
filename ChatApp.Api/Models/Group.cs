@@ -25,5 +25,5 @@ public class Group<T> where T : struct
 /// <summary>
 ///		Available groups.
 /// </summary>
-public class Groups : Group<Guid>
+public class Group : Group<Guid>
 { }

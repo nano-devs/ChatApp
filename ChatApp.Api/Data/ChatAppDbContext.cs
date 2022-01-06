@@ -47,7 +47,7 @@ public class ChatAppDbContext : DbContext
 
 	public DbSet<Friends>? Friends { set; get; }
 
-	public DbSet<Groups>? Groups { set; get; }
+	public DbSet<Group>? Groups { set; get; }
 
 	public DbSet<GroupMember>? GroupMembers { set; get; }
 

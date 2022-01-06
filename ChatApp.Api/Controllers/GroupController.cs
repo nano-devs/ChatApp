@@ -9,12 +9,12 @@ using Microsoft.AspNetCore.Mvc;
 [Route("[controller]/[action]")]
 public class GroupController : ControllerBase
 {
-	protected IRepository<Group<Guid>> _groupsRepository;
+	protected IRepository<Group> _groupsRepository;
 	protected IGroupMembersRepository _groupMembersRepository;
 
 	public GroupController(GroupsRepository groupsRepository, IGroupMembersRepository groupMembersRepository)
 	{
-		this._groupsRepository = (IRepository<Group<Guid>>)groupsRepository;
+		this._groupsRepository = groupsRepository;
 		this._groupMembersRepository = groupMembersRepository;
 	}
 
@@ -67,7 +67,7 @@ public class GroupController : ControllerBase
 	[HttpPost]
 	public async Task<Guid> Create(string name, Guid userId)
 	{
-		Groups? group = new Groups();
+		Group? group = new Group();
 		var newGroupId = Guid.Empty;
 
 		while (group != null)
@@ -79,7 +79,7 @@ public class GroupController : ControllerBase
 		try
 		{
 			await this._groupsRepository.AddAsync(
-				new Groups() { Id = newGroupId, Name = name });
+				new Group() { Id = newGroupId, Name = name });
 
 			await this._groupMembersRepository.AddAsync(
 				new GroupMember() { GroupId = newGroupId, UserId = userId });
