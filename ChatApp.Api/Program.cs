@@ -43,7 +43,7 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IFriendsRepository, FriendsRepository>();
-builder.Services.AddScoped<IGroupsRepository, GroupsRepository>();
+builder.Services.AddScoped<GroupsRepository>();
 builder.Services.AddScoped<IGroupMembersRepository, GroupMembersRepository>();
 
 builder.Services.AddSwaggerGen(c =>

@@ -10,10 +10,10 @@ using Microsoft.EntityFrameworkCore;
 [Route("[controller]/[action]")]
 public class GroupController : ControllerBase
 {
-	protected IGroupsRepository _groupsRepository;
+	protected GroupsRepository _groupsRepository;
 	protected IGroupMembersRepository _groupMembersRepository;
 
-	public GroupController(IGroupsRepository groupsRepository, IGroupMembersRepository groupMembersRepository)
+	public GroupController(GroupsRepository groupsRepository, IGroupMembersRepository groupMembersRepository)
 	{
 		this._groupsRepository = groupsRepository;
 		this._groupMembersRepository = groupMembersRepository;
