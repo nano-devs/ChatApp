@@ -6,7 +6,7 @@
 /// <typeparam name="T">
 ///		The type used for the primary key for the model.
 /// </typeparam>
-public class Groups<T> where T : struct
+public class Group<T> where T : struct
 {
 	/// <summary>
 	///		Universally unique identifier for each records.
@@ -25,5 +25,5 @@ public class Groups<T> where T : struct
 /// <summary>
 ///		Available groups.
 /// </summary>
-public class Groups : Groups<Guid>
+public class Group : Group<Guid>
 { }
