@@ -4,6 +4,7 @@ using System.Data;
 
 using ChatApp.Api.Data;
 using ChatApp.Api.Models;
+using ChatApp.Api.Services.Repositories;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,12 +13,16 @@ using Microsoft.EntityFrameworkCore;
 [Route("[controller]/[action]")]
 public class GroupChatController : ControllerBase
 {
-	private readonly ChatAppDbContext _context;
 	private const char _Delimeter = ';';
+	protected IGroupChatsRepository _groupChatRepository;
+	protected IGroupMembersRepository _groupMembersRepository;
+	protected IPendingGroupChatsRepository _pendingGroupChatsRepository;
 
-	public GroupChatController(ChatAppDbContext context)
+	public GroupChatController(IGroupChatsRepository groupChatRepository, IGroupMembersRepository groupMembersRepository, IPendingGroupChatsRepository pendingGroupChatsRepository)
 	{
-		this._context = context;
+		this._groupChatRepository = groupChatRepository;
+		this._groupMembersRepository = groupMembersRepository;
+		this._pendingGroupChatsRepository = pendingGroupChatsRepository;
 	}
 
 	/// <summary>
@@ -33,21 +38,15 @@ public class GroupChatController : ControllerBase
 	[HttpPost]
 	public async Task<object> AddChat(Guid userId, Guid groupId, string message)
 	{
-		if (this._context.GroupChats is null)
-		{
-			return "Group Chat context is null";
-		}
-
-		GroupChat? groupChat = null;
+		GroupChat? groupChat = new();
 		var newGroupChatId = Guid.Empty;
 
 		while (groupChat != null)
 		{
 			newGroupChatId = Guid.NewGuid();
 
-			groupChat = await this._context.GroupChats
-				.AsNoTrackingWithIdentityResolution()
-				.FirstOrDefaultAsync(o => o.Id == newGroupChatId);
+			groupChat = await this._groupChatRepository
+				.GetByIdAsync(newGroupChatId);
 		}
 
 		try
@@ -60,8 +59,8 @@ public class GroupChatController : ControllerBase
 				Message = message,
 				Timestamp = DateTime.UtcNow
 			};
-			await this._context.GroupChats.AddAsync(groupChat);
-			await this._context.SaveChangesAsync();
+			await this._groupChatRepository.AddAsync(groupChat);
+			await this._groupChatRepository.SaveAsync();
 			return newGroupChatId;
 		}
 		catch
@@ -84,11 +83,6 @@ public class GroupChatController : ControllerBase
 	[HttpPost]
 	public async Task<object> AddChatV2(Guid userId, Guid groupId, string message)
 	{
-		if (this._context.GroupMembers is null)
-		{
-			return "Group Member context is null";
-		}
-
 		try
 		{
 			var groupChatId = (Guid)await this.AddChat(userId, groupId, message);
@@ -96,50 +90,12 @@ public class GroupChatController : ControllerBase
 			// add message/chat to PendingGroupChat for all member
 			// TODO: only member that offline
 
-			var groupMembers = await this._context.GroupMembers
-				.AsNoTrackingWithIdentityResolution()
-				.Where(o => o.GroupId == groupId && o.UserId != userId)
-				.Select(o => o.UserId)
-				.ToListAsync();
+			var groupMembers = (IList<Guid>)await this._groupMembersRepository
+				.GetGroupMembersAsync(groupId);
+			
+			groupMembers.Remove(userId);
 
-			return await this.AddPendingChat(groupChatId, groupMembers.ToArray());
-		}
-		catch
-		{
-			return "Cant store message";
-		}
-	}
-
-	/// <summary>
-	/// Add not received message/chat into PendingGroupChat 
-	/// </summary>
-	/// <param name="groupChatId"></param>
-	/// <param name="userId">User that not received the message/chat</param>
-	/// <returns></returns>
-	[HttpPost]
-	public async Task<object> AddPendingChat(Guid groupChatId, params Guid[] userId)
-	{
-		if (this._context.PendingGroupChats is null)
-		{
-			return "Pending Group Chat Chat context is null";
-		}
-
-		try
-		{
-			var pendingGroupChat = new PendingGroupChat[userId.Length];
-
-			for (var i = 0; i < pendingGroupChat.Length; i++)
-			{
-				pendingGroupChat[i] = new PendingGroupChat
-				{
-					GroupChatId = groupChatId,
-					UserId = userId[i]
-				};
-			}
-
-			await this._context.PendingGroupChats.AddRangeAsync(pendingGroupChat);
-			await this._context.SaveChangesAsync();
-			return "message saved temporary";
+			return await this.AddPendingChat(groupChatId, groupMembers);
 		}
 		catch
 		{
@@ -154,13 +110,44 @@ public class GroupChatController : ControllerBase
 	/// <param name="userId">User that not received the message/chat, delimiter ';'</param>
 	/// <returns></returns>
 	[HttpPost]
-	public async Task<object> AddPendingChatV2(Guid groupChatId, string userId)
+	public async Task<object> AddPendingChat(Guid groupChatId, string userId)
 	{
 		var ids = userId.Contains(_Delimeter) ?
 				userId.Split(_Delimeter).Select(Guid.Parse).ToList() :
 				new List<Guid> { Guid.Parse(userId) };
 
-		return await this.AddPendingChat(groupChatId, ids.ToArray());
+		return await this.AddPendingChat(groupChatId, ids);
+	}
+	
+	/// <summary>
+	/// Add not received message/chat into PendingGroupChat 
+	/// </summary>
+	/// <param name="groupChatId"></param>
+	/// <param name="userId">User that not received the message/chat</param>
+	/// <returns></returns>
+	protected async Task<object> AddPendingChat(Guid groupChatId, IList<Guid> userIds)
+	{
+		try
+		{
+			var pendingGroupChat = new PendingGroupChat[userIds.Count];
+
+			for (var i = 0; i < pendingGroupChat.Length; i++)
+			{
+				pendingGroupChat[i] = new PendingGroupChat
+				{
+					GroupChatId = groupChatId,
+					UserId = userIds[i]
+				};
+			}
+
+			await this._pendingGroupChatsRepository.AddRangeAsync(pendingGroupChat);
+			await this._pendingGroupChatsRepository.SaveAsync();
+			return "message saved temporary";
+		}
+		catch
+		{
+			return "Can't store pending chat message";
+		}
 	}
 
 	/// <summary>
@@ -172,11 +159,6 @@ public class GroupChatController : ControllerBase
 	[HttpGet]
 	public async Task<object> SyncChat(Guid userId, Guid groupId)
 	{
-		if (this._context.PendingGroupChats is null)
-		{
-			return "Pending Group Chat Chat context is null";
-		}
-
 		try
 		{
 			/* 
@@ -190,17 +172,18 @@ public class GroupChatController : ControllerBase
 			*/
 			// TODO: simplified query for sync chat
 
-			var pendingChat = await this._context.PendingGroupChats
-				.AsNoTrackingWithIdentityResolution()
-				.Where(o => o.UserId == userId)
-				.Select(o => o.GroupChatId)
-				.ToListAsync();
+			var pendingChatIds = await this._pendingGroupChatsRepository
+				.GetPendingChatAsync(userId);
 
-			var chats = from o in this._context.GroupChats
-						where pendingChat.Contains(o.Id) && o.GroupId == groupId
-						select o;
+			var chats = await this._groupChatRepository
+				.GetGroupChatThatPendingAsync(groupId, pendingChatIds);
+			
+			if (chats.Any())
+			{
+				return chats;
+			}
 
-			return await chats.ToListAsync();
+			return "No pending chat.";
 		}
 		catch
 		{
@@ -214,29 +197,25 @@ public class GroupChatController : ControllerBase
 	/// <param name="groupChatId"></param>
 	/// <param name="userId">User that not received the message/chat</param>
 	/// <returns></returns>
-	[HttpPost]
-	public async Task<object> RemovePendingChat(Guid userId, params Guid[] groupChatId)
+	protected async Task<object> RemovePendingChat(Guid userId, IList<Guid> groupChatId)
 	{
-		if (this._context.PendingGroupChats is null)
-		{
-			return "Pending Group Chat Chat context is null";
-		}
-
 		try
 		{
-			var pendingGroupChat = new PendingGroupChat[groupChatId.Length];
+			//var pendingGroupChat = new PendingGroupChat[groupChatId.Count];
+			var pendingGroupChat = new List<PendingGroupChat>();
 
-			for (var i = 0; i < pendingGroupChat.Length; i++)
+			foreach (var chatId in groupChatId)
 			{
-				pendingGroupChat[i] = new PendingGroupChat
-				{
-					GroupChatId = groupChatId[i],
-					UserId = userId
-				};
+				pendingGroupChat.Add(
+					new PendingGroupChat()
+					{
+						UserId = userId,
+						GroupChatId = chatId
+					});
 			}
 
-			this._context.PendingGroupChats.RemoveRange(pendingGroupChat);
-			await this._context.SaveChangesAsync();
+			await this._pendingGroupChatsRepository.RemoveRangeAsync(pendingGroupChat);
+			await this._pendingGroupChatsRepository.SaveAsync();
 			return $"some pending chat list for user { userId } is removed";
 		}
 		catch
@@ -252,13 +231,13 @@ public class GroupChatController : ControllerBase
 	/// <param name="userId">User that not received the message/chat</param>
 	/// <returns></returns>
 	[HttpPost]
-	public async Task<object> RemovePendingChatV2(Guid userId, string groupChatId)
+	public async Task<object> RemovePendingChat(Guid userId, string groupChatId)
 	{
 		var ids = groupChatId.Contains(_Delimeter) ?
-				   groupChatId.Split(_Delimeter).Select(Guid.Parse).ToList() :
-				   new List<Guid> { Guid.Parse(groupChatId) };
+				  groupChatId.Split(_Delimeter).Select(Guid.Parse).ToList() :
+				  new List<Guid> { Guid.Parse(groupChatId) };
 
-		return await this.RemovePendingChat(userId, ids.ToArray());
+		return await this.RemovePendingChat(userId, ids);
 	}
 
 	/// <summary>
@@ -269,16 +248,6 @@ public class GroupChatController : ControllerBase
 	[HttpPost]
 	public async Task<object> RemoveChat(Guid groupId)
 	{
-		if (this._context.PendingGroupChats is null)
-		{
-			return "Pending Group Chat Chat context is null";
-		}
-
-		if (this._context.GroupChats is null)
-		{
-			return "Group Chat Chat context is null";
-		}
-
 		/* 
 		DELETE FROM GroupChats 
 		WHERE GroupId == x AND 
@@ -287,27 +256,37 @@ public class GroupChatController : ControllerBase
 		// TODO: simplified version for delete group chat
 
 		// get chat list from group
-		var chats = await this._context.GroupChats
-			.AsNoTrackingWithIdentityResolution()
-			.Where(o => o.Id == groupId)
-			.Select(o => o.Id)
-			.ToListAsync();
+		
+		var chats = await this._groupChatRepository.
+			FindAsync(o=>o.Id == groupId);
+
+		//var chats = await this._context.GroupChats
+		//	.AsNoTrackingWithIdentityResolution()
+		//	.Where(o => o.Id == groupId)
+		//	.Select(o => o.Id)
+		//	.ToListAsync();
 
 		// get GroupChatId that have pending list
-		var pending = await this._context.PendingGroupChats
-			.AsNoTrackingWithIdentityResolution()
-			.Where(o => !chats.Contains(o.GroupChatId))
-			.Select(o => o.GroupChatId).ToListAsync();
+		//var pending = await this._context.PendingGroupChats
+		//	.AsNoTrackingWithIdentityResolution()
+		//	.Where(o => !chats.Contains(o.GroupChatId))
+		//	.Select(o => o.GroupChatId).ToListAsync();
+
+		var pending = await this._pendingGroupChatsRepository
+			.GetGroupChatThatHavePendingListAsync(chats.Select(o => o.Id));
 
 		// get group chat list that do not have pending list
-		var removed = this._context.GroupChats
-			.AsNoTrackingWithIdentityResolution()
-			.Where(o => !pending.Contains(o.Id));
+		//var removed = this._groupChatRepositoryGroupChats
+		//	.AsNoTrackingWithIdentityResolution()
+		//	.Where(o => !pending.Contains(o.Id));
+
+		var removed = await this._groupChatRepository
+			.GetGroupChatThatHaveNoPendingAsync(pending);
 
 		if (removed.Any())
 		{
-			this._context.GroupChats.RemoveRange(await removed.ToListAsync());
-			await this._context.SaveChangesAsync();
+			await this._groupChatRepository.RemoveRangeAsync(removed);
+			await this._groupChatRepository.SaveAsync();
 			return this.Ok();
 		}
 		else

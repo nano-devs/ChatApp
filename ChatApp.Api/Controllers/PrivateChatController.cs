@@ -4,6 +4,7 @@ using System.Data;
 
 using ChatApp.Api.Data;
 using ChatApp.Api.Models;
+using ChatApp.Api.Services.Repositories;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,11 +13,11 @@ using Microsoft.EntityFrameworkCore;
 [Route("[controller]/[action]")]
 public class PrivateChatController : ControllerBase
 {
-	private readonly ChatAppDbContext _context;
-
-	public PrivateChatController(ChatAppDbContext context)
+	protected IPrivateChatsRepository _privateChatRepository;
+	
+	public PrivateChatController(IPrivateChatsRepository privateChatRepository)
 	{
-		this._context = context;
+		this._privateChatRepository = privateChatRepository;
 	}
 
 	/// <summary>
@@ -32,20 +33,14 @@ public class PrivateChatController : ControllerBase
 	[HttpPost]
 	public async Task<object> AddChat(Guid userId, Guid friendId, string message)
 	{
-		if (this._context.PrivateChats is null)
-		{
-			return "Private Chat context is null";
-		}
-
-		PrivateChat? chat = null;
+		PrivateChat? chat = new();
 		var newId = Guid.Empty;
 
 		while (chat != null)
 		{
 			newId = Guid.NewGuid();
-			chat = await this._context.PrivateChats
-				.AsNoTrackingWithIdentityResolution()
-				.FirstOrDefaultAsync(o => o.Id == newId);
+			chat = await this._privateChatRepository
+				.GetByIdAsync(newId);
 		}
 
 		try
@@ -59,8 +54,8 @@ public class PrivateChatController : ControllerBase
 				Timestamp = DateTime.UtcNow
 			};
 
-			await this._context.PrivateChats.AddAsync(chat);
-			await this._context.SaveChangesAsync();
+			await this._privateChatRepository.AddAsync(chat);
+			await this._privateChatRepository.SaveAsync();
 			return "message saved temporary";
 		}
 		catch
@@ -78,20 +73,12 @@ public class PrivateChatController : ControllerBase
 	[HttpGet]
 	public async Task<object> GetChat(Guid userId, Guid friendId)
 	{
-		if (this._context.PrivateChats is null)
-		{
-			return "Private Chat context is null";
-		}
-
-		var records = this._context.PrivateChats
-			.AsNoTrackingWithIdentityResolution()
-			.Where(o =>
-				(o.From == userId && o.To == friendId) ||
-				(o.From == friendId && o.To == userId));
+		var records = await this._privateChatRepository
+			.GetChatsFromFriendAsync(userId, friendId);
 
 		if (records.Any())
 		{
-			return await records.ToListAsync();
+			return records;
 		}
 		else
 		{
@@ -108,26 +95,17 @@ public class PrivateChatController : ControllerBase
 	[HttpPost]
 	public async Task<object> RemoveChat(Guid userId, Guid friendId)
 	{
-		if (this._context.PrivateChats is null)
+		try
 		{
-			return "Private Chat context is null";
-		}
-
-		var records = this._context.PrivateChats
-			.AsNoTrackingWithIdentityResolution()
-			.Where(o =>
-				(o.From == userId && o.To == friendId) ||
-				(o.From == friendId && o.To == userId));
-
-		if (records.Any())
-		{
-			this._context.PrivateChats.RemoveRange(await records.ToListAsync());
-			await this._context.SaveChangesAsync();
+			await this._privateChatRepository.RemoveStoredChatAsync(userId, friendId);
+			await this._privateChatRepository.SaveAsync();
 			return this.Ok();
 		}
-		else
+		catch
 		{
-			return $"theres no chat to remove";
+			return $"Failed to remove chats";
 		}
+
+		return $"theres no chat to remove";
 	}
 }

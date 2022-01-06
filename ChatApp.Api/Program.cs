@@ -1,6 +1,6 @@
 global using System;
 
-using ChatApp.Api.Repositories;
+using ChatApp.Api.Services.Repositories;
 using ChatApp.Api.Data;
 
 using Microsoft.AspNetCore.Mvc;
@@ -43,6 +43,8 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IFriendsRepository, FriendsRepository>();
+builder.Services.AddScoped<IGroupsRepository, GroupsRepository>();
+builder.Services.AddScoped<IGroupMembersRepository, GroupMembersRepository>();
 
 builder.Services.AddSwaggerGen(c =>
 {

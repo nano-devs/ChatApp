@@ -25,13 +25,8 @@ public class Repository<T> : IRepository<T> where T : class
 		return this._context.Set<T>().Find(id);
 	}
 
-	public virtual async Task<T?> GetByIdAsync(Guid? id)
+	public virtual async Task<T?> GetByIdAsync(Guid id)
 	{
-		if (id == null)
-		{
-			throw new NullReferenceException();
-		}
-
 		return await this._context.Set<T>().FindAsync(id);
 	}
 

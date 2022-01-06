@@ -21,27 +21,26 @@ public class FriendsRepository : Repository<Friends>, IFriendsRepository
 		this._friends = context.Friends;
 	}
 
-	public IEnumerable<Guid> GetFriends(Guid userId)
+	public async Task<IEnumerable<Guid>> GetFriendsAsync(Guid userId)
 	{
-		return this._friends
+		return await this._friends
 			.AsNoTrackingWithIdentityResolution()
 			.Where(o => o.UserId == userId)
-			.Select(o => o.FriendId);
+			.Select(o => o.FriendId)
+			.ToListAsync();
 	}
 
-	public bool IsFriendExist(Guid userId, Guid friendId)
+	public async Task<bool> IsFriendExistAsync(Guid userId, Guid friendId)
 	{
-		var friends = this._friends
+		return await this._friends
 			.AsNoTrackingWithIdentityResolution()
-			.Where(o => o.UserId == userId && o.FriendId == friendId);
+			.AnyAsync(o => o.UserId == userId && o.FriendId == friendId);
 
 		// alternative
-		//var friends = this._context.Friends
+		// return await this._context.Friends
 		//	.AsNoTrackingWithIdentityResolution()
-		//	.Where(o => (o.UserId == userId && o.FriendId == friendId) || 
+		//	.AnyAsync(o => (o.UserId == userId && o.FriendId == friendId) || 
 		//				(o.UserId == friendId && o.FriendId == userId));
-
-		return friends.Any();
 	}
 
 	public async Task<bool> AddFriendshipAsync(Guid userId, Guid friendId)

@@ -46,7 +46,7 @@ public class FriendController : ControllerBase
 			return "Friends context is null";
 		}
 
-		var friends = this._friendsRepository.GetFriends(userId);
+		var friends = await this._friendsRepository.GetFriendsAsync(userId);
 
 		if (friends.Any())
 		{
@@ -72,7 +72,7 @@ public class FriendController : ControllerBase
 			return "Friends context is null";
 		}
 
-		if (this._friendsRepository.IsFriendExist(userId, friendId))
+		if (await this._friendsRepository.IsFriendExistAsync(userId, friendId))
 		{
 			return $"{ userId } already a friend { friendId }";
 		}
@@ -108,7 +108,7 @@ public class FriendController : ControllerBase
 			return "Friends context is null";
 		}
 
-		if (!this._friendsRepository.IsFriendExist(userId, friendId))
+		if (! await this._friendsRepository.IsFriendExistAsync(userId, friendId))
 		{
 			return $"{ userId } do not have a friend { friendId }";
 
