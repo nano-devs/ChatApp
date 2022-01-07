@@ -1,11 +1,14 @@
 global using System;
 
 using ChatApp.Api.Data;
+using ChatApp.Api.Models.Configurations;
 using ChatApp.Api.Services.Repositories;
-
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -82,6 +85,23 @@ builder.Services.AddDbContext<ChatAppDbContext>(options =>
 	}
 });
 
+AuthenticationConfiguration authConfig = new AuthenticationConfiguration();
+builder.Configuration.Bind("Authentication", authConfig);
+builder.Services.AddSingleton(authConfig);
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(option =>
+{
+	option.TokenValidationParameters = new TokenValidationParameters()
+	{
+		IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authConfig.AccessTokenSecret!)),
+		ValidIssuer = authConfig.Issuer,
+		ValidAudience = authConfig.Audience,
+		ValidateIssuerSigningKey = true,
+		ValidateIssuer = true,
+		ValidateAudience = true,
+		ClockSkew = System.TimeSpan.Zero,
+	};
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -102,6 +122,7 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
