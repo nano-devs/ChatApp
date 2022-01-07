@@ -15,7 +15,7 @@ ChatApp
 
 Since The .NET Core SDK includes an HTTPS development certificate and installed as part of the first-run experience. Alternatively (if you already had cert configured, signed, trusted, & installed from the templates in Visual Studio or from the dotnet new command), you can update the following settings in `appsettings.json`:
 
-```
+```json
   "Kestrel": {
     "Endpoints": {
       "Http": {
@@ -31,4 +31,11 @@ Since The .NET Core SDK includes an HTTPS development certificate and installed 
 ## Apply Migration
 ```sh
 PM> Update-Database -context ChatAppDbContext
+```
+
+in case of `Could not load assembly 'ChatApp.Auth'. Ensure it is referenced by the startup project 'ChatApp.Api'.`. Add project reference:
+```xml
+<ItemGroup>
+  <ProjectReference Include="..\ChatApp.Auth\ChatApp.Auth.csproj" />
+</ItemGroup>
 ```
