@@ -12,3 +12,23 @@ ChatApp
 	- *.pem
 	- *-key.pem
 ```
+
+Since The .NET Core SDK includes an HTTPS development certificate and installed as part of the first-run experience. Alternatively (if you already had cert configured, signed, trusted, & installed from the templates in Visual Studio or from the dotnet new command), you can update the following settings in `appsettings.json`:
+
+```
+  "Kestrel": {
+    "Endpoints": {
+      "Http": {
+        "Url": "http://localhost:5000"
+      },
+      "Https": {
+        "Url": "https://localhost:8000"
+      }
+    }
+  }
+```
+
+## Apply Migration
+```sh
+PM> Update-Database -context ChatAppDbContext
+```
