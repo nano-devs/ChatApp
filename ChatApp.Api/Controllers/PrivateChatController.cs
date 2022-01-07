@@ -12,7 +12,7 @@ public class PrivateChatController : ControllerBase
 
 	public PrivateChatController(IPrivateChatsRepository privateChatRepository)
 	{
-		this._privateChatRepository = privateChatRepository;
+		_privateChatRepository = privateChatRepository;
 	}
 
 	/// <summary>
@@ -34,7 +34,7 @@ public class PrivateChatController : ControllerBase
 		while (chat != null)
 		{
 			newId = Guid.NewGuid();
-			chat = await this._privateChatRepository
+			chat = await _privateChatRepository
 				.GetByIdAsync(newId);
 		}
 
@@ -49,8 +49,8 @@ public class PrivateChatController : ControllerBase
 				Timestamp = DateTime.UtcNow
 			};
 
-			await this._privateChatRepository.AddAsync(chat);
-			await this._privateChatRepository.SaveAsync();
+			await _privateChatRepository.AddAsync(chat);
+			await _privateChatRepository.SaveAsync();
 			return "message saved temporary";
 		}
 		catch
@@ -68,7 +68,7 @@ public class PrivateChatController : ControllerBase
 	[HttpGet]
 	public async Task<object> GetChat(Guid userId, Guid friendId)
 	{
-		var records = await this._privateChatRepository
+		var records = await _privateChatRepository
 			.GetChatsFromFriendAsync(userId, friendId);
 
 		if (records.Any())
@@ -92,15 +92,13 @@ public class PrivateChatController : ControllerBase
 	{
 		try
 		{
-			await this._privateChatRepository.RemoveStoredChatAsync(userId, friendId);
-			await this._privateChatRepository.SaveAsync();
-			return this.Ok();
+			await _privateChatRepository.RemoveStoredChatAsync(userId, friendId);
+			await _privateChatRepository.SaveAsync();
+			return Ok();
 		}
 		catch
 		{
 			return $"Failed to remove chats";
 		}
-
-		return $"theres no chat to remove";
 	}
 }
