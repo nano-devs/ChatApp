@@ -16,20 +16,20 @@ public class GroupsRepository : Repository<Group>
 			throw new NullReferenceException("Groups context is null");
 		}
 
-		this._groups = context.Groups;
+		_groups = context.Groups;
 	}
 
 	public override Group? GetById(Guid id)
 	{
-		return this._groups
+		return _groups
 			.AsNoTrackingWithIdentityResolution()
-			.FirstOrDefault(o => o.Id == id);
+			.FirstOrDefault(o => o.UniqueGuid == id);
 	}
 
 	public override async Task<Group?> GetByIdAsync(Guid id)
 	{
-		return await this._groups
+		return await _groups
 			.AsNoTrackingWithIdentityResolution()
-			.FirstOrDefaultAsync(o => o.Id == id);
+			.FirstOrDefaultAsync(o => o.UniqueGuid == id);
 	}
 }

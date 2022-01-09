@@ -1,7 +1,6 @@
 ﻿namespace ChatApp.Api.Data;
 
 using ChatApp.Api.Models;
-
 using Microsoft.EntityFrameworkCore;
 
 public class ChatAppDbContext : DbContext
@@ -35,6 +34,14 @@ public class ChatAppDbContext : DbContext
 		{
 			entity.HasKey("GroupChatId", "UserId");
 		});
+
+		builder.Entity<User>()
+			.Property(u => u.UniqueGuid)
+			.ValueGeneratedOnAdd();
+
+		builder.Entity<Group>()
+			.Property(g => g.UniqueGuid)
+			.ValueGeneratedOnAdd();
 	}
 
 	#region Properties
@@ -50,6 +57,14 @@ public class ChatAppDbContext : DbContext
 	public DbSet<Group>? Groups { set; get; }
 
 	public DbSet<GroupMember>? GroupMembers { set; get; }
+
+	public DbSet<User>? Users { get; set; }
+
+	public DbSet<RefreshToken>? RefreshTokens { get; set; }
+
+	public DbSet<Message>? Messages { get; set; }
+
+	public DbSet<PrivateMessage>? PrivateMessages { get; set; }
 
 	#endregion Properties
 }
