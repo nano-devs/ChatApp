@@ -1,4 +1,4 @@
-﻿namespace ChatApp.Api.Services.RefreshTokenRepositories;
+﻿namespace ChatApp.Api.Services.Repositories.RefreshTokenRepositories;
 
 using ChatApp.Api.Data;
 using ChatApp.Api.Models;
