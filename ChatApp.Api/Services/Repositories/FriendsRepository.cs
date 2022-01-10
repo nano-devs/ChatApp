@@ -7,7 +7,7 @@ using ChatApp.Api.Models;
 
 using Microsoft.EntityFrameworkCore;
 
-public class FriendsRepository : Repository<Friends>, IFriendsRepository
+public class FriendsRepository : Repository<Friends, Guid>, IFriendsRepository
 {
 	protected DbSet<Friends> _friends;
 

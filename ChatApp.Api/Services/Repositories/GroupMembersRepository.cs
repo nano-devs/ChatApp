@@ -7,7 +7,7 @@ using ChatApp.Api.Models;
 
 using Microsoft.EntityFrameworkCore;
 
-public class GroupMembersRepository : Repository<GroupMember>, IGroupMembersRepository
+public class GroupMembersRepository : Repository<GroupMember, Guid>, IGroupMembersRepository
 {
 	protected DbSet<GroupMember> _groupMembers;
 

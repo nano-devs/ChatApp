@@ -1,29 +1,18 @@
 ﻿namespace ChatApp.Api.Models;
 
-/// <summary>
-///		Available groups.
-/// </summary>
-/// <typeparam name="T">
-///		The type used for the primary key for the model.
-/// </typeparam>
-public class Group<T> where T : struct
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+public class Group
 {
-	/// <summary>
-	///		Universally unique identifier for each records.
-	/// </summary>
-	/// <remarks>
-	///		Primary Key for database table.
-	/// </remarks>
-	public T Id { set; get; }
+	[Key]
+	[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+	public Guid Id { set; get; }
 
-	/// <summary>
-	///		Group name.
-	/// </summary>
+	[Required]
 	public string? Name { set; get; }
-}
+	
+	public ICollection<User>? Users { set; get; }
 
-/// <summary>
-///		Available groups.
-/// </summary>
-public class Group : Group<Guid>
-{ }
+	public ICollection<Message>? Messages { set; get; }
+}

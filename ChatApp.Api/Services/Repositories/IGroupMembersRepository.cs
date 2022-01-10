@@ -2,7 +2,7 @@
 
 using ChatApp.Api.Models;
 
-public interface IGroupMembersRepository : IRepository<GroupMember>
+public interface IGroupMembersRepository : IRepository<GroupMember, Guid>
 {
 	Task<IEnumerable<Guid>> GetGroupMembersAsync(Guid groupId);
 

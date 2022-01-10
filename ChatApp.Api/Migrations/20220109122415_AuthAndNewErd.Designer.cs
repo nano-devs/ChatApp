@@ -3,6 +3,7 @@ using System;
 using ChatApp.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChatApp.Api.Migrations
 {
     [DbContext(typeof(ChatAppDbContext))]
-    partial class ChatAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220109122415_AuthAndNewErd")]
+    partial class AuthAndNewErd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.1");
@@ -32,12 +34,16 @@ namespace ChatApp.Api.Migrations
 
             modelBuilder.Entity("ChatApp.Api.Models.Group", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UniqueGuid")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -95,8 +101,8 @@ namespace ChatApp.Api.Migrations
                     b.Property<int>("PostedByUserId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Guid?>("SendToGroupId")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("SendToGroupId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("SentDateTime")
                         .ValueGeneratedOnAdd()
@@ -149,9 +155,9 @@ namespace ChatApp.Api.Migrations
 
             modelBuilder.Entity("ChatApp.Api.Models.PrivateMessage", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("MessageId")
                         .HasColumnType("INTEGER");
@@ -262,8 +268,8 @@ namespace ChatApp.Api.Migrations
 
             modelBuilder.Entity("GroupUser", b =>
                 {
-                    b.Property<Guid>("GroupsId")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("GroupsId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("UsersId")
                         .HasColumnType("INTEGER");

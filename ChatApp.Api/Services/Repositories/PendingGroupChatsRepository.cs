@@ -8,7 +8,7 @@ using ChatApp.Api.Models;
 
 using Microsoft.EntityFrameworkCore;
 
-public class PendingGroupChatsRepository : Repository<PendingGroupChat>, IPendingGroupChatsRepository
+public class PendingGroupChatsRepository : Repository<PendingGroupChat, Guid>, IPendingGroupChatsRepository
 {
 	protected DbSet<PendingGroupChat> _pendingGroupChats;
 
