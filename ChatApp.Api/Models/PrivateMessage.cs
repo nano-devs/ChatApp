@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace ChatApp.Api.Models;
 
-namespace ChatApp.Api.Models;
+using System.ComponentModel.DataAnnotations;
 
 public class PrivateMessage
 {

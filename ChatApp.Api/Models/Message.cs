@@ -13,7 +13,7 @@ public class Message
     [DataType(DataType.DateTime)]
     [DisplayFormat(DataFormatString = "yyyy-MM-dd HH:mm:ss")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public DateTime SentDateTime { set; get; }
+    public DateTime SentDateTime { set; get; } = DateTime.Now;
 
     [Required]
     [MaxLength(255)]
