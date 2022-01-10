@@ -14,5 +14,5 @@ public class Group
 	
 	public ICollection<User>? Users { set; get; }
 
-	public ICollection<Message>? Messages { set; get; }
+	public ICollection<GroupMessage>? Messages { set; get; }
 }

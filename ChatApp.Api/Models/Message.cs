@@ -24,8 +24,4 @@ public class Message
 
     [ForeignKey("PostedByUserId")]
     public User? PostedByUser { get; set; }
-
-    public PrivateMessage? SendToPrivateMessage { get; set; }
-
-    public Group? SendToGroup { get; set; }
 }

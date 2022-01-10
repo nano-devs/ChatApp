@@ -62,5 +62,7 @@ public class ChatAppDbContext : DbContext
 
 	public DbSet<PrivateMessage>? PrivateMessages { get; set; }
 
+	public DbSet<GroupMessage>? GroupMessages { get; set; }
+
 	#endregion Properties
 }

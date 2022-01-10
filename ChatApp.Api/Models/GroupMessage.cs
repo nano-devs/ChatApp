@@ -2,18 +2,18 @@
 
 using System.ComponentModel.DataAnnotations;
 
-public class PrivateMessage
+public class GroupMessage
 {
     [Key]
     public int Id { get; set; }
 
     [Required]
-    public int SendToUserId { get; set; }
+    public Guid GroupId { get; set; }
 
     [Required]
     public int MessageId { get; set; }
 
-    public User? SendToUser { get; set; }
+    public Group? Group { get; set; }
 
     public Message? Message { get; set; }
 }

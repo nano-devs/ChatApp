@@ -3,6 +3,7 @@ using System;
 using ChatApp.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChatApp.Api.Migrations
 {
     [DbContext(typeof(ChatAppDbContext))]
-    partial class ChatAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220110142615_UpdateMessageRelations")]
+    partial class UpdateMessageRelations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.1");
@@ -99,7 +101,7 @@ namespace ChatApp.Api.Migrations
 
                     b.HasIndex("MessageId");
 
-                    b.ToTable("GroupMessages");
+                    b.ToTable("GroupMessage");
                 });
 
             modelBuilder.Entity("ChatApp.Api.Models.Message", b =>
