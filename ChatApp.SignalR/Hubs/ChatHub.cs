@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 public class ChatHub : Hub
 {
-    private readonly IRepository<Group> groupRepository;
+    private readonly IRepository<Group, Guid> groupRepository;
 
     public ChatHub(GroupsRepository groupRepository)
     {
