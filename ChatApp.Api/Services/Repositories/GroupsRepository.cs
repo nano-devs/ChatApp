@@ -23,13 +23,13 @@ public class GroupsRepository : Repository<Group, Guid>
 	{
 		return _groups
 			.AsNoTrackingWithIdentityResolution()
-			.FirstOrDefault(o => o.UniqueGuid == id);
+			.FirstOrDefault(o => o.Id == id);
 	}
 
 	public override async Task<Group?> GetByIdAsync(Guid id)
 	{
 		return await _groups
 			.AsNoTrackingWithIdentityResolution()
-			.FirstOrDefaultAsync(o => o.UniqueGuid == id);
+			.FirstOrDefaultAsync(o => o.Id == id);
 	}
 }

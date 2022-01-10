@@ -79,7 +79,7 @@ public class GroupController : ControllerBase
 		try
 		{
 			await this._groupsRepository.AddAsync(
-				new Group() { Name = name });
+				new Group() { Id = newGroupId, Name = name });
 
 			await this._groupMembersRepository.AddAsync(
 				new GroupMember() { GroupId = newGroupId, UserId = userId });

@@ -38,10 +38,6 @@ public class ChatAppDbContext : DbContext
 		builder.Entity<User>()
 			.Property(u => u.UniqueGuid)
 			.ValueGeneratedOnAdd();
-
-		builder.Entity<Group>()
-			.Property(g => g.UniqueGuid)
-			.ValueGeneratedOnAdd();
 	}
 
 	#region Properties

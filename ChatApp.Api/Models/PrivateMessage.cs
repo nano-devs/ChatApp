@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 public class PrivateMessage
 {
     [Key]
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
     [Required]
     public int SendToUserId { get; set; }

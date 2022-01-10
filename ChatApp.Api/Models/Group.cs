@@ -7,10 +7,7 @@ public class Group
 {
 	[Key]
 	[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-	public int Id { set; get; }
-
-	[Required]
-	public Guid UniqueGuid { set; get; } = Guid.NewGuid();
+	public Guid Id { set; get; }
 
 	[Required]
 	public string? Name { set; get; }
