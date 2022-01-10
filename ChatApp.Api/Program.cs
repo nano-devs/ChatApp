@@ -4,8 +4,8 @@ using ChatApp.Api.Data;
 using ChatApp.Api.Models;
 using ChatApp.Api.Models.Configurations;
 using ChatApp.Api.Services.Authenticators;
-using ChatApp.Api.Services.RefreshTokenRepositories;
 using ChatApp.Api.Services.Repositories;
+using ChatApp.Api.Services.Repositories.RefreshTokenRepositories;
 using ChatApp.Api.Services.TokenGenerators;
 using ChatApp.Api.Services.TokenValidators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -51,7 +51,7 @@ builder.WebHost.ConfigureKestrel(o =>
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
 builder.Services.AddScoped<IFriendsRepository, FriendsRepository>();
 builder.Services.AddScoped<GroupsRepository>();
 builder.Services.AddScoped<IGroupMembersRepository, GroupMembersRepository>();
