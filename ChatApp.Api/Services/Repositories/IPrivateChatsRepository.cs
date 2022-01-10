@@ -2,7 +2,7 @@
 
 using ChatApp.Api.Models;
 
-public interface IPrivateChatsRepository : IRepository<PrivateChat>
+public interface IPrivateChatsRepository : IRepository<PrivateChat, Guid>
 {
 	Task<IEnumerable<PrivateChat>> GetChatsFromFriendAsync(Guid userId, Guid friendId);
 

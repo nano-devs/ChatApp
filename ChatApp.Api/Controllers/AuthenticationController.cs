@@ -4,7 +4,7 @@ using ChatApp.Api.Models;
 using ChatApp.Api.Models.Requests;
 using ChatApp.Api.Models.Responses;
 using ChatApp.Api.Services.Authenticators;
-using ChatApp.Api.Services.RefreshTokenRepositories;
+using ChatApp.Api.Services.Repositories.RefreshTokenRepositories;
 using ChatApp.Api.Services.TokenValidators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

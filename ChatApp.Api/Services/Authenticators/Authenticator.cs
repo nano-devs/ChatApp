@@ -2,7 +2,7 @@
 
 using ChatApp.Api.Models;
 using ChatApp.Api.Models.Responses;
-using ChatApp.Api.Services.RefreshTokenRepositories;
+using ChatApp.Api.Services.Repositories.RefreshTokenRepositories;
 using ChatApp.Api.Services.TokenGenerators;
 
 public class Authenticator

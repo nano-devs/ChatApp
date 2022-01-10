@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 [Route("[controller]/[action]")]
 public class GroupController : ControllerBase
 {
-	protected IRepository<Group> _groupsRepository;
+	protected IRepository<Group, Guid> _groupsRepository;
 	protected IGroupMembersRepository _groupMembersRepository;
 
 	public GroupController(GroupsRepository groupsRepository, IGroupMembersRepository groupMembersRepository)
