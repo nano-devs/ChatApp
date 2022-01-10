@@ -4,7 +4,7 @@ using ChatApp.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-public class Repository<T> : IRepository<T> where T : class
+public class Repository<T, TKey> : IRepository<T, TKey> where T : class
 {
 	protected readonly ChatAppDbContext _context;
 
@@ -18,12 +18,12 @@ public class Repository<T> : IRepository<T> where T : class
 		_context = context;
 	}
 
-	public virtual T? GetById(Guid id)
+	public virtual T? GetById(TKey id)
 	{
 		return _context.Set<T>().Find(id);
 	}
 
-	public virtual async Task<T?> GetByIdAsync(Guid id)
+	public virtual async Task<T?> GetByIdAsync(TKey id)
 	{
 		return await _context.Set<T>().FindAsync(id);
 	}

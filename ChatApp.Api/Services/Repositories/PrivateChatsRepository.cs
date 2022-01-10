@@ -8,7 +8,7 @@ using ChatApp.Api.Models;
 
 using Microsoft.EntityFrameworkCore;
 
-public class PrivateChatsRepository : Repository<PrivateChat>, IPrivateChatsRepository
+public class PrivateChatsRepository : Repository<PrivateChat, Guid>, IPrivateChatsRepository
 {
 	protected DbSet<PrivateChat> _privateChats;
 
