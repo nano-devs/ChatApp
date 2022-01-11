@@ -4,11 +4,10 @@ using System.ComponentModel.DataAnnotations;
 
 public class GroupMessage
 {
-    [Key]
     public int Id { get; set; }
 
     [Required]
-    public Guid GroupId { get; set; }
+    public int GroupId { get; set; }
 
     [Required]
     public int MessageId { get; set; }

@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 
 public class RefreshToken
 {
-    [Key]
     public Guid Id { get; set; }
 
     public int UserId { get; set; }

@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 
 public class PrivateMessage
 {
-    [Key]
     public int Id { get; set; }
 
     [Required]
