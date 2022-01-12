@@ -18,6 +18,15 @@ public class Repository<T, TKey> : IRepository<T, TKey> where T : class
 		_context = context;
 	}
 
+	public ChatAppDbContext Context
+	{
+		protected set { }
+		get 
+		{
+			return this._context;
+		}
+	}
+
 	public virtual T? GetById(TKey id)
 	{
 		return _context.Set<T>().Find(id);
