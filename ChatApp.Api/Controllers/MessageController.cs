@@ -113,7 +113,7 @@ public class MessageController : ControllerBase
     }
 
     [HttpPost("Group")]
-    public async Task<ActionResult<Message>> PostGroupMessage([FromBody] PostMessageRequest<Guid> request)
+    public async Task<ActionResult<Message>> PostGroupMessage([FromBody] PostMessageRequest<int> request)
     {
         var userId = GetCurrentRequestUserId();
 
