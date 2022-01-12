@@ -7,6 +7,9 @@ public class Group<T> where T : struct
 	public T Id { set; get; }
 
 	[Required]
+	public Guid UniqueGuid { set; get; }
+
+	[Required]
 	public string? Name { set; get; }
 	
 	public ICollection<User>? Users { set; get; }
