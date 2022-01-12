@@ -13,10 +13,14 @@ public class Friend<T> where T : struct
 	/// </summary>
 	public T UserId { set; get; }
 
+	public User? User { set; get; }
+
 	/// <summary>
 	///		The id of user friend.
 	/// </summary>
 	public T FriendId { set; get; }
+
+	public User? Friends { set; get; }
 }
 
 /// <summary>
