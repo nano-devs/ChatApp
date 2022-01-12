@@ -26,27 +26,40 @@ public class ChatAppDbContext : DbContext
 		{
 			entity.HasKey("UserId", "FriendId");
 		});
+
 		builder.Entity<GroupMember>(entity =>
 		{
 			entity.HasKey("UserId", "GroupId");
 		});
+
 		builder.Entity<PendingGroupChat>(entity =>
 		{
-			entity.HasKey("GroupChatId", "UserId");
+			entity.HasKey("UserId", "GroupChatId");
 		});
 
-		builder.Entity<User>()
-			.Property(u => u.UniqueGuid)
-			.ValueGeneratedOnAdd();
+		builder.Entity<User>(entity =>
+		{
+			entity.Property(u => u.UniqueGuid).ValueGeneratedOnAdd();
+			entity.HasAlternateKey(u => u.UniqueGuid);
+		});
+
+		// create foreign key
+		builder.Entity<Message>(entity =>
+		{
+			entity.HasAlternateKey(o => o.PostedByUserId);
+		});
+
+		builder.Entity<PrivateMessage>(entity =>
+		{
+			entity.HasAlternateKey(o => o.SendToUserId);
+		});
 	}
 
 	#region Properties
 
-	public DbSet<PrivateChat>? PrivateChats { set; get; }
-
 	public DbSet<GroupChat>? GroupChats { set; get; }
-
 	public DbSet<PendingGroupChat>? PendingGroupChats { set; get; }
+	public DbSet<PrivateChat>? PrivateChats { set; get; }
 
 	public DbSet<Friends>? Friends { set; get; }
 
