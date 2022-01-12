@@ -21,12 +21,12 @@ public class FriendsRepository : Repository<Friends, Guid>, IFriendsRepository
 		this._friends = context.Friends;
 	}
 
-	public async Task<IEnumerable<Guid>> GetFriendsAsync(Guid userId)
+	public async Task<IEnumerable<object>> GetFriendsAsync(Guid userId)
 	{
 		return await this._friends
 			.AsNoTrackingWithIdentityResolution()
 			.Where(o => o.UserId == userId)
-			.Select(o => o.FriendId)
+			.Select(o => new { o.FriendId, o.Friends})
 			.ToListAsync();
 	}
 
