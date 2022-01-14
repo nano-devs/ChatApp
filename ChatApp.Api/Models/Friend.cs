@@ -26,5 +26,5 @@ public class Friend<T> where T : struct
 /// <summary>
 ///		Relationship of user with each other.
 /// </summary>
-public class Friends : Friend<Guid>
+public class Friend : Friend<Guid>
 { }

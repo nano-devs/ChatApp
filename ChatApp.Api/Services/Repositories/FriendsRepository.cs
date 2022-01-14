@@ -7,9 +7,9 @@ using ChatApp.Api.Models;
 
 using Microsoft.EntityFrameworkCore;
 
-public class FriendsRepository : Repository<Friends, Guid>, IFriendsRepository
+public class FriendsRepository : Repository<Friend, Guid>, IFriendsRepository
 {
-	protected DbSet<Friends> _friends;
+	protected DbSet<Friend> _friends;
 
 	public FriendsRepository(ChatAppDbContext context) : base(context)
 	{
@@ -47,12 +47,12 @@ public class FriendsRepository : Repository<Friends, Guid>, IFriendsRepository
 	{
 		try
 		{
-			var friend1 = new Friends
+			var friend1 = new Friend
 			{
 				UserId = userId,
 				FriendId = friendId
 			};
-			var friend2 = new Friends
+			var friend2 = new Friend
 			{
 				UserId = friendId,
 				FriendId = userId
@@ -72,12 +72,12 @@ public class FriendsRepository : Repository<Friends, Guid>, IFriendsRepository
 	{
 		try
 		{
-			var friend1 = new Friends
+			var friend1 = new Friend
 			{
 				UserId = userId,
 				FriendId = friendId
 			};
-			var friend2 = new Friends
+			var friend2 = new Friend
 			{
 				UserId = friendId,
 				FriendId = userId

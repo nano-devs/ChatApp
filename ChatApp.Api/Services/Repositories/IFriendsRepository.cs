@@ -2,7 +2,7 @@
 
 using ChatApp.Api.Models;
 
-public interface IFriendsRepository : IRepository<Friends, Guid>
+public interface IFriendsRepository : IRepository<Friend, Guid>
 {
 	Task<IEnumerable<object>> GetFriendsAsync(Guid userId);
 

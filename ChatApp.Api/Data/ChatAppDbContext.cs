@@ -22,7 +22,7 @@ public class ChatAppDbContext : DbContext
 		// For example, you can rename the ASP.NET Core Identity table names and more.
 		// Add your customizations after calling base.OnModelCreating(builder);
 
-		builder.Entity<Friends>(entity =>
+		builder.Entity<Friend>(entity =>
 		{
 			entity.HasKey("UserId", "FriendId");
 		});
@@ -61,7 +61,7 @@ public class ChatAppDbContext : DbContext
 	public DbSet<PendingGroupChat>? PendingGroupChats { set; get; }
 	public DbSet<PrivateChat>? PrivateChats { set; get; }
 
-	public DbSet<Friends>? Friends { set; get; }
+	public DbSet<Friend>? Friends { set; get; }
 
 	public DbSet<Group>? Groups { set; get; }
 
