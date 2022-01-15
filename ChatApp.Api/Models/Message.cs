@@ -1,6 +1,7 @@
 ﻿namespace ChatApp.Api.Models;
 
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 public class Message
 {
@@ -16,6 +17,7 @@ public class Message
     public string? Content { get; set; }
 
     [Required]
+    [ForeignKey("User")]
     public int PostedByUserId { get; set; }
 
     public User? PostedByUser { get; set; }
