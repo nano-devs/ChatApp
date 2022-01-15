@@ -21,7 +21,7 @@ public class FriendsRepository : Repository<Friend, Guid>, IFriendsRepository
 		this._friends = context.Friends;
 	}
 
-	public async Task<IEnumerable<object>> GetFriendsAsync(Guid userId)
+	public async Task<IEnumerable<object>> GetFriendsAsync(int userId)
 	{
 		return await this._friends
 			.AsNoTrackingWithIdentityResolution()
@@ -30,7 +30,7 @@ public class FriendsRepository : Repository<Friend, Guid>, IFriendsRepository
 			.ToListAsync();
 	}
 
-	public async Task<bool> IsFriendExistAsync(Guid userId, Guid friendId)
+	public async Task<bool> IsFriendExistAsync(int userId, int friendId)
 	{
 		return await this._friends
 			.AsNoTrackingWithIdentityResolution()
@@ -43,7 +43,7 @@ public class FriendsRepository : Repository<Friend, Guid>, IFriendsRepository
 		//				(o.UserId == friendId && o.FriendId == userId));
 	}
 
-	public async Task<bool> AddFriendshipAsync(Guid userId, Guid friendId)
+	public async Task<bool> AddFriendshipAsync(int userId, int friendId)
 	{
 		try
 		{
@@ -68,7 +68,7 @@ public class FriendsRepository : Repository<Friend, Guid>, IFriendsRepository
 		}
 	}
 
-	public async Task<bool> RemoveFriendshipAsync(Guid userId, Guid friendId)
+	public async Task<bool> RemoveFriendshipAsync(int userId, int friendId)
 	{
 		try
 		{
