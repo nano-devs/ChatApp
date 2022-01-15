@@ -12,7 +12,7 @@ public class User : IdentityUser<int>
     
     public ICollection<User>? Friends { get; set; }
     
-    public ICollection<Group>? Groups { get; set; }
+    public ICollection<GroupMember>? GroupMembers { get; set; }
     
     public ICollection<Message>? Messages { get; set; }
     

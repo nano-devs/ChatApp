@@ -11,8 +11,8 @@ public class Group<T> where T : struct
 
 	[Required]
 	public string? Name { set; get; }
-	
-	public ICollection<User>? Users { set; get; }
+
+	public ICollection<GroupMember>? GroupMembers { set; get; }
 
 	public ICollection<GroupMessage>? Messages { set; get; }
 }
