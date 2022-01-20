@@ -37,7 +37,7 @@ public class FriendController : ControllerBase
 	/// <param name="userId"></param>
 	/// <returns></returns>
 	[HttpGet]
-	public async Task<object> MyFriends(Guid userId)
+	public async Task<object> MyFriends(int userId)
 	{
 		if (this._friendsRepository is null)
 		{
@@ -63,7 +63,7 @@ public class FriendController : ControllerBase
 	/// <param name="userpId"></param>
 	/// <returns></returns>
 	[HttpPost]
-	public async Task<object> AddFriend(Guid userId, Guid friendId)
+	public async Task<object> AddFriend(int userId, int friendId)
 	{
 		if (this._friendsRepository is null)
 		{
@@ -99,7 +99,7 @@ public class FriendController : ControllerBase
 	/// <param name="userpId"></param>
 	/// <returns></returns>
 	[HttpPost]
-	public async Task<object> RemoveFriend(Guid userId, Guid friendId)
+	public async Task<object> RemoveFriend(int userId, int friendId)
 	{
 		if (this._friendsRepository is null)
 		{
