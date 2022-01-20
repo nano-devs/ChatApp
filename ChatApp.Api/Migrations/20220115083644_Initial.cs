@@ -1,38 +1,28 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace ChatApp.Api.Migrations
 {
-    public partial class AuthAndNewErd : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
-                name: "Name",
-                table: "Groups",
-                type: "TEXT",
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "TEXT",
-                oldNullable: true);
-
-            migrationBuilder.AlterColumn<int>(
-                name: "Id",
-                table: "Groups",
-                type: "INTEGER",
-                nullable: false,
-                oldClrType: typeof(Guid),
-                oldType: "TEXT")
-                .Annotation("Sqlite:Autoincrement", true);
-
-            migrationBuilder.AddColumn<Guid>(
-                name: "UniqueGuid",
-                table: "Groups",
-                type: "TEXT",
-                nullable: false,
-                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
+            migrationBuilder.CreateTable(
+                name: "Groups",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    UniqueGuid = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Groups", x => x.Id);
+                    table.UniqueConstraint("AK_Groups_UniqueGuid", x => x.UniqueGuid);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Users",
@@ -61,6 +51,7 @@ namespace ChatApp.Api.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                    table.UniqueConstraint("AK_Users_UniqueGuid", x => x.UniqueGuid);
                     table.ForeignKey(
                         name: "FK_Users_Users_UserId",
                         column: x => x.UserId,
@@ -69,24 +60,48 @@ namespace ChatApp.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "GroupUser",
+                name: "Friends",
                 columns: table => new
                 {
-                    GroupsId = table.Column<int>(type: "INTEGER", nullable: false),
-                    UsersId = table.Column<int>(type: "INTEGER", nullable: false)
+                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
+                    FriendId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GroupUser", x => new { x.GroupsId, x.UsersId });
+                    table.PrimaryKey("PK_Friends", x => new { x.UserId, x.FriendId });
                     table.ForeignKey(
-                        name: "FK_GroupUser_Groups_GroupsId",
-                        column: x => x.GroupsId,
+                        name: "FK_Friends_Users_FriendId",
+                        column: x => x.FriendId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Friends_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GroupMembers",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
+                    GroupId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GroupMembers", x => new { x.UserId, x.GroupId });
+                    table.ForeignKey(
+                        name: "FK_GroupMembers_Groups_GroupId",
+                        column: x => x.GroupId,
                         principalTable: "Groups",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_GroupUser_Users_UsersId",
-                        column: x => x.UsersId,
+                        name: "FK_GroupMembers_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -100,17 +115,11 @@ namespace ChatApp.Api.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     SentDateTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Content = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
-                    PostedByUserId = table.Column<int>(type: "INTEGER", nullable: false),
-                    SendToGroupId = table.Column<int>(type: "INTEGER", nullable: true)
+                    PostedByUserId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Messages", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Messages_Groups_SendToGroupId",
-                        column: x => x.SendToGroupId,
-                        principalTable: "Groups",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Messages_Users_PostedByUserId",
                         column: x => x.PostedByUserId,
@@ -139,15 +148,46 @@ namespace ChatApp.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GroupMessages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    GroupId = table.Column<int>(type: "INTEGER", nullable: false),
+                    MessageId = table.Column<int>(type: "INTEGER", nullable: false),
+                    SendToUserId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GroupMessages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GroupMessages_Groups_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "Groups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GroupMessages_Messages_MessageId",
+                        column: x => x.MessageId,
+                        principalTable: "Messages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GroupMessages_Users_SendToUserId",
+                        column: x => x.SendToUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PrivateMessages",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     SendToUserId = table.Column<int>(type: "INTEGER", nullable: false),
-                    MessageId = table.Column<int>(type: "INTEGER", nullable: false),
-                    SendToUser = table.Column<Guid>(type: "TEXT", nullable: true),
-                    UserId = table.Column<int>(type: "INTEGER", nullable: true)
+                    MessageId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -159,16 +199,37 @@ namespace ChatApp.Api.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_PrivateMessages_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_PrivateMessages_Users_SendToUserId",
+                        column: x => x.SendToUserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_GroupUser_UsersId",
-                table: "GroupUser",
-                column: "UsersId");
+                name: "IX_Friends_FriendId",
+                table: "Friends",
+                column: "FriendId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GroupMembers_GroupId",
+                table: "GroupMembers",
+                column: "GroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GroupMessages_GroupId",
+                table: "GroupMessages",
+                column: "GroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GroupMessages_MessageId",
+                table: "GroupMessages",
+                column: "MessageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GroupMessages_SendToUserId",
+                table: "GroupMessages",
+                column: "SendToUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_PostedByUserId",
@@ -176,20 +237,14 @@ namespace ChatApp.Api.Migrations
                 column: "PostedByUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Messages_SendToGroupId",
-                table: "Messages",
-                column: "SendToGroupId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_PrivateMessages_MessageId",
                 table: "PrivateMessages",
-                column: "MessageId",
-                unique: true);
+                column: "MessageId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PrivateMessages_UserId",
+                name: "IX_PrivateMessages_SendToUserId",
                 table: "PrivateMessages",
-                column: "UserId");
+                column: "SendToUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RefreshTokens_UserId",
@@ -205,7 +260,13 @@ namespace ChatApp.Api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "GroupUser");
+                name: "Friends");
+
+            migrationBuilder.DropTable(
+                name: "GroupMembers");
+
+            migrationBuilder.DropTable(
+                name: "GroupMessages");
 
             migrationBuilder.DropTable(
                 name: "PrivateMessages");
@@ -214,31 +275,13 @@ namespace ChatApp.Api.Migrations
                 name: "RefreshTokens");
 
             migrationBuilder.DropTable(
+                name: "Groups");
+
+            migrationBuilder.DropTable(
                 name: "Messages");
 
             migrationBuilder.DropTable(
                 name: "Users");
-
-            migrationBuilder.DropColumn(
-                name: "UniqueGuid",
-                table: "Groups");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "Name",
-                table: "Groups",
-                type: "TEXT",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "TEXT");
-
-            migrationBuilder.AlterColumn<Guid>(
-                name: "Id",
-                table: "Groups",
-                type: "TEXT",
-                nullable: false,
-                oldClrType: typeof(int),
-                oldType: "INTEGER")
-                .OldAnnotation("Sqlite:Autoincrement", true);
         }
     }
 }

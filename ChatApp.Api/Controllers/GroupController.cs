@@ -1,19 +1,23 @@
 ﻿namespace ChatApp.Api.Controllers;
 
+using ChatApp.Api.Data;
 using ChatApp.Api.Models;
 using ChatApp.Api.Services.Repositories;
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+[Authorize]
 [ApiController]
 [Route("[controller]/[action]")]
 public class GroupController : ControllerBase
 {
-	protected IRepository<Group, Guid> _groupsRepository;
+	protected IGroupsRepository _groupsRepository;
 	protected IGroupMembersRepository _groupMembersRepository;
+	protected ChatAppDbContext _context;
 
-	public GroupController(GroupsRepository groupsRepository, IGroupMembersRepository groupMembersRepository)
+	public GroupController(ChatAppDbContext context, IGroupsRepository groupsRepository, IGroupMembersRepository groupMembersRepository)
 	{
+		this._context = context;
 		this._groupsRepository = groupsRepository;
 		this._groupMembersRepository = groupMembersRepository;
 	}
@@ -41,13 +45,8 @@ public class GroupController : ControllerBase
 	/// <param name="groupId"></param>
 	/// <returns></returns>
 	[HttpGet]
-	public async Task<object> Details(Guid groupId)
+	public async Task<object> Details(int groupId)
 	{
-		if (this._groupsRepository is null)
-		{
-			return "Group context is null";
-		}
-
 		var group = await this._groupsRepository.GetByIdAsync(groupId);
 
 		if (group == null)
@@ -58,6 +57,19 @@ public class GroupController : ControllerBase
 		return group;
 	}
 
+	[HttpGet("DetailsV2")]
+	public async Task<object> Details(Guid groupId)
+	{
+		var group = await this._groupsRepository
+			.GetByUniqueIdAsync(groupId);
+
+		if (group == null)
+		{
+			return this.NotFound();
+		}
+
+		return group;
+	}
 	/// <summary>
 	///		Create a new group
 	/// </summary>
@@ -65,16 +77,10 @@ public class GroupController : ControllerBase
 	/// <param name="userId">The user id that create the group.</param>
 	/// <returns></returns>
 	[HttpPost]
-	public async Task<Guid> Create(string name, Guid userId)
+	public async Task<int> Create(string name, int userId)
 	{
 		Group? group = new Group();
-		var newGroupId = Guid.Empty;
-
-		while (group != null)
-		{
-			newGroupId = Guid.NewGuid();
-			group = await this._groupsRepository.GetByIdAsync(newGroupId);
-		}
+		var newGroupId = this._context.Groups!.Count() + 1;
 
 		try
 		{
@@ -90,7 +96,7 @@ public class GroupController : ControllerBase
 		}
 		catch
 		{
-			return Guid.Empty;
+			return 0;
 		}
 	}
 
@@ -113,7 +119,7 @@ public class GroupController : ControllerBase
 	}
 
 	[HttpPost]
-	public async Task<object> Edit(Guid groupId, string name)
+	public async Task<object> Edit(int groupId, string name)
 	{
 		return await this.ChangeName(groupId, name);
 	}
@@ -125,7 +131,7 @@ public class GroupController : ControllerBase
 	/// <param name="name"></param>
 	/// <returns></returns>
 	[HttpPost]
-	public async Task<object> ChangeName(Guid groupId, string name)
+	public async Task<object> ChangeName(int groupId, string name)
 	{
 		var group = await this._groupsRepository.GetByIdAsync(groupId);
 
@@ -154,7 +160,7 @@ public class GroupController : ControllerBase
 	/// <remarks>All member or user that still in the group automatically removed.</remarks>
 	/// <returns></returns>
 	[HttpPost]
-	public async Task<object> Delete(Guid groupId)
+	public async Task<object> Delete(int groupId)
 	{
 		var group = await this._groupsRepository.GetByIdAsync(groupId);
 
@@ -183,7 +189,7 @@ public class GroupController : ControllerBase
 	/// <param name="userpId"></param>
 	/// <returns></returns>
 	[HttpPost]
-	public async Task<object> AddMember(Guid groupId, Guid userId)
+	public async Task<object> AddMember(int groupId, int userId)
 	{
 		if (this._groupsRepository is null)
 		{
@@ -217,7 +223,7 @@ public class GroupController : ControllerBase
 	/// <param name="userpId"></param>
 	/// <returns></returns>
 	[HttpPost]
-	public async Task<object> RemoveMember(Guid groupId, Guid userId)
+	public async Task<object> RemoveMember(int groupId, int userId)
 	{
 		var exist = await this._groupMembersRepository.IsMemberExistAsync(groupId, userId);
 

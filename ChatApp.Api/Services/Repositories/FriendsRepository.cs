@@ -7,9 +7,9 @@ using ChatApp.Api.Models;
 
 using Microsoft.EntityFrameworkCore;
 
-public class FriendsRepository : Repository<Friends, Guid>, IFriendsRepository
+public class FriendsRepository : Repository<Friend, Guid>, IFriendsRepository
 {
-	protected DbSet<Friends> _friends;
+	protected DbSet<Friend> _friends;
 
 	public FriendsRepository(ChatAppDbContext context) : base(context)
 	{
@@ -21,16 +21,16 @@ public class FriendsRepository : Repository<Friends, Guid>, IFriendsRepository
 		this._friends = context.Friends;
 	}
 
-	public async Task<IEnumerable<Guid>> GetFriendsAsync(Guid userId)
+	public async Task<IEnumerable<object>> GetFriendsAsync(int userId)
 	{
 		return await this._friends
 			.AsNoTrackingWithIdentityResolution()
 			.Where(o => o.UserId == userId)
-			.Select(o => o.FriendId)
+			.Select(o => new { o.FriendId, o.Friends})
 			.ToListAsync();
 	}
 
-	public async Task<bool> IsFriendExistAsync(Guid userId, Guid friendId)
+	public async Task<bool> IsFriendExistAsync(int userId, int friendId)
 	{
 		return await this._friends
 			.AsNoTrackingWithIdentityResolution()
@@ -43,16 +43,16 @@ public class FriendsRepository : Repository<Friends, Guid>, IFriendsRepository
 		//				(o.UserId == friendId && o.FriendId == userId));
 	}
 
-	public async Task<bool> AddFriendshipAsync(Guid userId, Guid friendId)
+	public async Task<bool> AddFriendshipAsync(int userId, int friendId)
 	{
 		try
 		{
-			var friend1 = new Friends
+			var friend1 = new Friend
 			{
 				UserId = userId,
 				FriendId = friendId
 			};
-			var friend2 = new Friends
+			var friend2 = new Friend
 			{
 				UserId = friendId,
 				FriendId = userId
@@ -68,16 +68,16 @@ public class FriendsRepository : Repository<Friends, Guid>, IFriendsRepository
 		}
 	}
 
-	public async Task<bool> RemoveFriendshipAsync(Guid userId, Guid friendId)
+	public async Task<bool> RemoveFriendshipAsync(int userId, int friendId)
 	{
 		try
 		{
-			var friend1 = new Friends
+			var friend1 = new Friend
 			{
 				UserId = userId,
 				FriendId = friendId
 			};
-			var friend2 = new Friends
+			var friend2 = new Friend
 			{
 				UserId = friendId,
 				FriendId = userId

@@ -11,23 +11,25 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChatApp.Api.Migrations
 {
     [DbContext(typeof(ChatAppDbContext))]
-    [Migration("20220109122415_AuthAndNewErd")]
-    partial class AuthAndNewErd
+    [Migration("20220115083644_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.1");
 
-            modelBuilder.Entity("ChatApp.Api.Models.Friends", b =>
+            modelBuilder.Entity("ChatApp.Api.Models.Friend", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("FriendId")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("FriendId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("UserId", "FriendId");
+
+                    b.HasIndex("FriendId");
 
                     b.ToTable("Friends");
                 });
@@ -48,43 +50,50 @@ namespace ChatApp.Api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasAlternateKey("UniqueGuid");
+
                     b.ToTable("Groups");
-                });
-
-            modelBuilder.Entity("ChatApp.Api.Models.GroupChat", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("From")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("GroupId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Message")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("GroupChats");
                 });
 
             modelBuilder.Entity("ChatApp.Api.Models.GroupMember", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<Guid>("GroupId")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("GroupId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("UserId", "GroupId");
 
+                    b.HasIndex("GroupId");
+
                     b.ToTable("GroupMembers");
+                });
+
+            modelBuilder.Entity("ChatApp.Api.Models.GroupMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MessageId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SendToUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("MessageId");
+
+                    b.HasIndex("SendToUserId");
+
+                    b.ToTable("GroupMessages");
                 });
 
             modelBuilder.Entity("ChatApp.Api.Models.Message", b =>
@@ -101,56 +110,14 @@ namespace ChatApp.Api.Migrations
                     b.Property<int>("PostedByUserId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("SendToGroupId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<DateTime>("SentDateTime")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PostedByUserId");
 
-                    b.HasIndex("SendToGroupId");
-
                     b.ToTable("Messages");
-                });
-
-            modelBuilder.Entity("ChatApp.Api.Models.PendingGroupChat", b =>
-                {
-                    b.Property<Guid>("GroupChatId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("GroupChatId", "UserId");
-
-                    b.ToTable("PendingGroupChats");
-                });
-
-            modelBuilder.Entity("ChatApp.Api.Models.PrivateChat", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("From")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Message")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("To")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PrivateChats");
                 });
 
             modelBuilder.Entity("ChatApp.Api.Models.PrivateMessage", b =>
@@ -162,21 +129,14 @@ namespace ChatApp.Api.Migrations
                     b.Property<int>("MessageId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Guid?>("SendToUser")
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("SendToUserId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("UserId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MessageId")
-                        .IsUnique();
+                    b.HasIndex("MessageId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("SendToUserId");
 
                     b.ToTable("PrivateMessages");
                 });
@@ -261,24 +221,76 @@ namespace ChatApp.Api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasAlternateKey("UniqueGuid");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("GroupUser", b =>
+            modelBuilder.Entity("ChatApp.Api.Models.Friend", b =>
                 {
-                    b.Property<int>("GroupsId")
-                        .HasColumnType("INTEGER");
+                    b.HasOne("ChatApp.Api.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("FriendId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<int>("UsersId")
-                        .HasColumnType("INTEGER");
+                    b.HasOne("ChatApp.Api.Models.User", "Friends")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasKey("GroupsId", "UsersId");
+                    b.Navigation("Friends");
 
-                    b.HasIndex("UsersId");
+                    b.Navigation("User");
+                });
 
-                    b.ToTable("GroupUser");
+            modelBuilder.Entity("ChatApp.Api.Models.GroupMember", b =>
+                {
+                    b.HasOne("ChatApp.Api.Models.Group", "Group")
+                        .WithMany("GroupMembers")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ChatApp.Api.Models.User", "User")
+                        .WithMany("GroupMembers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ChatApp.Api.Models.GroupMessage", b =>
+                {
+                    b.HasOne("ChatApp.Api.Models.Group", "Group")
+                        .WithMany("Messages")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ChatApp.Api.Models.Message", "Message")
+                        .WithMany()
+                        .HasForeignKey("MessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ChatApp.Api.Models.User", "SendToUser")
+                        .WithMany()
+                        .HasForeignKey("SendToUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
+
+                    b.Navigation("Message");
+
+                    b.Navigation("SendToUser");
                 });
 
             modelBuilder.Entity("ChatApp.Api.Models.Message", b =>
@@ -289,28 +301,26 @@ namespace ChatApp.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ChatApp.Api.Models.Group", "SendToGroup")
-                        .WithMany("Messages")
-                        .HasForeignKey("SendToGroupId");
-
                     b.Navigation("PostedByUser");
-
-                    b.Navigation("SendToGroup");
                 });
 
             modelBuilder.Entity("ChatApp.Api.Models.PrivateMessage", b =>
                 {
                     b.HasOne("ChatApp.Api.Models.Message", "Message")
-                        .WithOne("SendToPrivateMessage")
-                        .HasForeignKey("ChatApp.Api.Models.PrivateMessage", "MessageId")
+                        .WithMany()
+                        .HasForeignKey("MessageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ChatApp.Api.Models.User", null)
+                    b.HasOne("ChatApp.Api.Models.User", "SendToUser")
                         .WithMany("PrivateMessages")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("SendToUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Message");
+
+                    b.Navigation("SendToUser");
                 });
 
             modelBuilder.Entity("ChatApp.Api.Models.RefreshToken", b =>
@@ -331,34 +341,18 @@ namespace ChatApp.Api.Migrations
                         .HasForeignKey("UserId");
                 });
 
-            modelBuilder.Entity("GroupUser", b =>
-                {
-                    b.HasOne("ChatApp.Api.Models.Group", null)
-                        .WithMany()
-                        .HasForeignKey("GroupsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ChatApp.Api.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("ChatApp.Api.Models.Group", b =>
                 {
-                    b.Navigation("Messages");
-                });
+                    b.Navigation("GroupMembers");
 
-            modelBuilder.Entity("ChatApp.Api.Models.Message", b =>
-                {
-                    b.Navigation("SendToPrivateMessage");
+                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("ChatApp.Api.Models.User", b =>
                 {
                     b.Navigation("Friends");
+
+                    b.Navigation("GroupMembers");
 
                     b.Navigation("Messages");
 

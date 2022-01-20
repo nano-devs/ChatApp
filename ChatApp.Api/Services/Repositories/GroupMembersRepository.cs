@@ -7,7 +7,7 @@ using ChatApp.Api.Models;
 
 using Microsoft.EntityFrameworkCore;
 
-public class GroupMembersRepository : Repository<GroupMember, Guid>, IGroupMembersRepository
+public class GroupMembersRepository : Repository<GroupMember, int>, IGroupMembersRepository
 {
 	protected DbSet<GroupMember> _groupMembers;
 
@@ -21,7 +21,7 @@ public class GroupMembersRepository : Repository<GroupMember, Guid>, IGroupMembe
 		this._groupMembers = context.GroupMembers;
 	}
 
-	public async Task<IEnumerable<Guid>> GetGroupMembersAsync(Guid groupId)
+	public async Task<IEnumerable<int>> GetGroupMembersAsync(int groupId)
 	{
 		return await this._groupMembers
 			.AsNoTrackingWithIdentityResolution()
@@ -30,14 +30,23 @@ public class GroupMembersRepository : Repository<GroupMember, Guid>, IGroupMembe
 			.ToListAsync();
 	}
 
-	public async Task<bool> IsMemberExistAsync(Guid groupId, Guid userId)
+	public async Task<IEnumerable<int>> GetGroupMembersAsync(Guid groupUniqueId)
+	{
+		return await this._groupMembers
+			.AsNoTrackingWithIdentityResolution()
+			.Where(o => o.Group.UniqueGuid == groupUniqueId)
+			.Select(o => o.UserId)
+			.ToListAsync();
+	}
+
+	public async Task<bool> IsMemberExistAsync(int groupId, int userId)
 	{
 		return await this._groupMembers
 			.AsNoTrackingWithIdentityResolution()
 			.AnyAsync(o => o.GroupId == groupId && o.UserId == userId);
 	}
 
-	public async Task AddMemberAsync(Guid groupId, Guid userId)
+	public async Task AddMemberAsync(int groupId, int userId)
 	{
 		await this._groupMembers.AddAsync(
 			new GroupMember()
@@ -47,7 +56,7 @@ public class GroupMembersRepository : Repository<GroupMember, Guid>, IGroupMembe
 			});
 	}
 
-	public async Task AddMemberRangeAsync(Guid groupId, IEnumerable<Guid> userIds)
+	public async Task AddMemberRangeAsync(int groupId, IEnumerable<int> userIds)
 	{
 		foreach (var userId in userIds)
 		{

@@ -113,7 +113,7 @@ public class MessageController : ControllerBase
     }
 
     [HttpPost("Group")]
-    public async Task<ActionResult<Message>> PostGroupMessage([FromBody] PostMessageRequest<Guid> request)
+    public async Task<ActionResult<Message>> PostGroupMessage([FromBody] PostMessageRequest<int> request)
     {
         var userId = GetCurrentRequestUserId();
 
@@ -124,7 +124,7 @@ public class MessageController : ControllerBase
             return BadRequest();
         }
         // if not member
-        if (!SendToGroup.Users.Any(user => user.Id == userId))
+        if (!SendToGroup.GroupMembers.Any(user => user.UserId == userId))
         {
             return BadRequest();
         }

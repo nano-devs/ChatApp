@@ -22,47 +22,47 @@ public class ChatAppDbContext : DbContext
 		// For example, you can rename the ASP.NET Core Identity table names and more.
 		// Add your customizations after calling base.OnModelCreating(builder);
 
-		builder.Entity<Friends>(entity =>
+		builder.Entity<User>(entity =>
+		{
+			entity.Property(u => u.UniqueGuid).ValueGeneratedOnAdd();
+			entity.HasAlternateKey(u => u.UniqueGuid);
+		});
+
+		builder.Entity<Group>(entity =>
+		{
+			entity.Property(u => u.UniqueGuid).ValueGeneratedOnAdd();
+			entity.HasAlternateKey(u => u.UniqueGuid);
+		});
+
+		builder.Entity<Friend>(entity =>
 		{
 			entity.HasKey("UserId", "FriendId");
 		});
+
 		builder.Entity<GroupMember>(entity =>
 		{
 			entity.HasKey("UserId", "GroupId");
 		});
-		builder.Entity<PendingGroupChat>(entity =>
-		{
-			entity.HasKey("GroupChatId", "UserId");
-		});
 
-		builder.Entity<User>()
-			.Property(u => u.UniqueGuid)
-			.ValueGeneratedOnAdd();
 	}
 
 	#region Properties
 
-	public DbSet<PrivateChat>? PrivateChats { set; get; }
+	public DbSet<User>? Users { get; set; }
 
-	public DbSet<GroupChat>? GroupChats { set; get; }
-
-	public DbSet<PendingGroupChat>? PendingGroupChats { set; get; }
-
-	public DbSet<Friends>? Friends { set; get; }
+	public DbSet<Friend>? Friends { set; get; }
 
 	public DbSet<Group>? Groups { set; get; }
 
 	public DbSet<GroupMember>? GroupMembers { set; get; }
-
-	public DbSet<User>? Users { get; set; }
-
-	public DbSet<RefreshToken>? RefreshTokens { get; set; }
 
 	public DbSet<Message>? Messages { get; set; }
 
 	public DbSet<PrivateMessage>? PrivateMessages { get; set; }
 
 	public DbSet<GroupMessage>? GroupMessages { get; set; }
+
+	public DbSet<RefreshToken>? RefreshTokens { get; set; }
 
 	#endregion Properties
 }
