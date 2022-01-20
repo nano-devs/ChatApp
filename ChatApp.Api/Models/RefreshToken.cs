@@ -1,7 +1,5 @@
 ﻿namespace ChatApp.Api.Models;
 
-using System.ComponentModel.DataAnnotations;
-
 public class RefreshToken
 {
     public Guid Id { get; set; }
