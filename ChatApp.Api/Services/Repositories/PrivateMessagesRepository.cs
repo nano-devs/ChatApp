@@ -1,13 +1,11 @@
 ﻿namespace ChatApp.Api.Services.Repositories;
 
+using ChatApp.Api.Data;
+using ChatApp.Api.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
-using ChatApp.Api.Data;
-using ChatApp.Api.Models;
-
-using Microsoft.EntityFrameworkCore;
 
 public class PrivateMessagesRepository : Repository<PrivateMessage, int>, IPrivateMessagesRepository
 {
@@ -25,36 +23,22 @@ public class PrivateMessagesRepository : Repository<PrivateMessage, int>, IPriva
 
 	public async Task<IEnumerable<object>> GetChatsFromFriendAsync(Guid userId, Guid friendId)
 	{
-		try
-		{
-			var msg = await 
-				(from message in this._context.Messages
-				 join privateMessage in this._context.PrivateMessages on message.Id equals privateMessage.MessageId
-				 where message.PostedByUser.UniqueGuid == userId &&
-					   privateMessage.SendToUser.UniqueGuid == friendId
-				 select new
-				 {
-					 message.Id,
-					 message.PostedByUserId,
-					 message.SentDateTime,
-					 message.Content
-				 })
-				 .AsNoTrackingWithIdentityResolution()
-				 .ToListAsync();
+		var msg = await _context.PrivateMessages!
+			.Where(privateMessage => 
+				(privateMessage.SendToUser!.UniqueGuid == friendId && privateMessage.Message!.PostedByUser!.UniqueGuid == userId) ||
+				(privateMessage.SendToUser!.UniqueGuid == userId && privateMessage.Message!.PostedByUser!.UniqueGuid == friendId)
+				)
+			.AsNoTrackingWithIdentityResolution()
+			.ToListAsync();
 
-			if (msg.Any())
-			{
-				return msg;
-			}
-
-			return new List<string>(){
-				$"There's no message for user { userId } from user { friendId }"
-			};
-		}
-		catch
+		if (msg.Any())
 		{
-			throw;
+			return msg;
 		}
+
+		return new List<string>(){
+			$"There's no message for user { userId } from user { friendId }"
+		};
 	}
 
 	public async Task RemoveStoredChatAsync(Guid userId, Guid friendId)
