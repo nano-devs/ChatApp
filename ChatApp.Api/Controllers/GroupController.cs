@@ -3,9 +3,10 @@
 using ChatApp.Api.Data;
 using ChatApp.Api.Models;
 using ChatApp.Api.Services.Repositories;
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+[Authorize]
 [ApiController]
 [Route("[controller]/[action]")]
 public class GroupController : ControllerBase
@@ -79,7 +80,7 @@ public class GroupController : ControllerBase
 	public async Task<int> Create(string name, int userId)
 	{
 		Group? group = new Group();
-		var newGroupId = this._context.Groups.Count() + 1;
+		var newGroupId = this._context.Groups!.Count() + 1;
 
 		try
 		{

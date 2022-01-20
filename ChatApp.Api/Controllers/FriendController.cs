@@ -1,8 +1,9 @@
 ﻿namespace ChatApp.Api.Controllers;
 using ChatApp.Api.Services.Repositories;
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+[Authorize]
 [ApiController]
 [Route("[controller]/[action]")]
 public class FriendController : ControllerBase
