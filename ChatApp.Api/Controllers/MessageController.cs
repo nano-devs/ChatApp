@@ -124,7 +124,7 @@ public class MessageController : ControllerBase
             return BadRequest();
         }
         // if not member
-        if (!SendToGroup.Users.Any(user => user.Id == userId))
+        if (!SendToGroup.GroupMembers.Any(user => user.UserId == userId))
         {
             return BadRequest();
         }
