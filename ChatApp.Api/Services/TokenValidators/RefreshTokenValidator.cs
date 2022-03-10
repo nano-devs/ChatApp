@@ -1,9 +1,7 @@
 ﻿namespace ChatApp.Api.Services.TokenValidators;
 
-using ChatApp.Api.Models.Configurations;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Text;
 
 public class RefreshTokenValidator : ITokenValidator
 {
