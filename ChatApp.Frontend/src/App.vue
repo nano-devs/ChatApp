@@ -15,11 +15,11 @@
       <v-divider class="py-0"></v-divider>
 
       <v-subheader>Your contacts</v-subheader>
-      
+
       <v-list class="py-0" nav dense shaped>
         <v-list-item-group v-model="group" active-class="indigo--text">
           <template v-for="(chat, index) in chats">
-            <v-list-item link :key="index" @click="selectedChat = chat">
+            <v-list-item link @click="selectedChat = chat" :to="'/dm/' + chat.name" replace :key="index">
               <v-list-item-avatar color="grey darken-1"></v-list-item-avatar>
 
               <v-list-item-content>
@@ -40,16 +40,18 @@
       </template>
     </v-navigation-drawer>
 
-    <v-app-bar app flat height="72">
-      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+    <!-- <v-app-bar app flat height="72">
+      <template v-if="selectedChat !== null">
+        <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
-      <v-app-bar-title class="text-no-wrap">{{ selectedChat ? selectedChat.name : '-' }}</v-app-bar-title>
+        <v-app-bar-title class="text-no-wrap">{{ selectedChat.name }}</v-app-bar-title>
+      </template>
 
       <v-spacer></v-spacer>
       <v-responsive max-width="156">
         <v-text-field dense flat hide-details rounded solo-inverted></v-text-field>
       </v-responsive>
-    </v-app-bar>
+    </v-app-bar>-->
 
     <router-view></router-view>
   </v-app>
@@ -62,8 +64,6 @@
 </style>
 
 <script>
-// import * as signalR from "@microsoft/signalr";
-
 export default {
   data: () => ({
     chats: [
@@ -80,26 +80,13 @@ export default {
     messages: [],
     selectedChat: null,
   }),
-  created: function () {
-    // let thisVue = this;
-
-    // this.connection = new signalR.HubConnectionBuilder()
-    //   .withUrl("https://localhost:7238/chathub", {
-    //     skipNegotiation: true,
-    //     transport: signalR.HttpTransportType.WebSockets,
-    //   })
-    //   .configureLogging(signalR.LogLevel.Information)
-    //   .build();
-
-    // this.connection.on("ReceiveMessage", function (user, message) {
-    //   thisVue.messages.push({ user, message });
-    //   console.log({ user, message });
-    // });
-
-    // this.connection.start();
-  },
   mounted: function () {
     this.selectedChat = this.chats[0];
   },
+  methods: {
+    toggleDrawer() {
+      this.drawer = !this.drawer
+    }
+  }
 };
 </script>

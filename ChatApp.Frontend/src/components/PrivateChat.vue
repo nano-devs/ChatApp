@@ -1,5 +1,17 @@
 <template>
   <v-main>
+    <v-app-bar app flat height="72">
+      <v-app-bar-nav-icon @click="$router.replace('/')">
+        <v-icon>mdi-close</v-icon>
+      </v-app-bar-nav-icon>
+
+      <v-app-bar-title class="text-no-wrap">{{ $route.params.contactId }}</v-app-bar-title>
+
+      <v-spacer></v-spacer>
+      <v-responsive max-width="156">
+        <v-text-field dense flat hide-details rounded solo-inverted></v-text-field>
+      </v-responsive>
+    </v-app-bar>
 
     <v-divider></v-divider>
 
@@ -21,31 +33,14 @@
 </template>
 
 <script>
-// import * as signalR from "@microsoft/signalr";
-
 export default {
-  data: () => ({
-    drawer: null,
-    data: null,
-    messages: [],
-  }),
+  data() {
+    return {
+      contactId: this.$route.params.contactId,
+      messages: [],
+    }
+  },
   created: function () {
-    // let thisVue = this;
-
-    // this.connection = new signalR.HubConnectionBuilder()
-    //   .withUrl("https://localhost:7238/chathub", {
-    //     skipNegotiation: true,
-    //     transport: signalR.HttpTransportType.WebSockets,
-    //   })
-    //   .configureLogging(signalR.LogLevel.Information)
-    //   .build();
-
-    // this.connection.on("ReceiveMessage", function (user, message) {
-    //   thisVue.messages.push({ user, message });
-    //   console.log({ user, message });
-    // });
-
-    // this.connection.start();
   },
 };
 </script>
