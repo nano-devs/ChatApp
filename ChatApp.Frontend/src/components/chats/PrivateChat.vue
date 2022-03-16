@@ -1,7 +1,7 @@
 <template>
   <v-main>
-    <v-app-bar app flat height="72">
-      <v-app-bar-nav-icon @click="$router.replace('/')">
+    <v-app-bar app flat height="72" v-if="!$vuetify.breakpoint.smAndDown">
+      <v-app-bar-nav-icon @click="$router.replace('/dm/')">
         <v-icon>mdi-close</v-icon>
       </v-app-bar-nav-icon>
 
