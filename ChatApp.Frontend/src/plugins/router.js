@@ -3,7 +3,7 @@ import VueRouter from 'vue-router'
 import BlankMain from '../components/chats/BlankMain.vue'
 import ChatLayout from '../components/chats/Layout.vue'
 import PrivateChat from '../components/chats/PrivateChat.vue'
-
+import Login from '../components/authentications/Login.vue'
 import NotFound from '../components/errors/NotFound.vue'
 
 Vue.use(VueRouter)
@@ -26,6 +26,10 @@ const routes = [
                 component: BlankMain
             },
         ]
+    },
+    {
+        path: '/login',
+        component: Login,
     },
     {
         path: '*',
