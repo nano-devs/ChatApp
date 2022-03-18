@@ -14,12 +14,13 @@ public class PendingGroupChatsRepository : Repository<PendingGroupChat, Guid>, I
 
 	public PendingGroupChatsRepository(ChatAppDbContext context) : base(context)
 	{
-		if (context.PendingGroupChats is null)
-		{
-			throw new NullReferenceException("Pending Group Chat context is null");
-		}
+		// PendingGroupChats is not included in DBContext
+		//if (context.PendingGroupChats is null)
+		//{
+		//	throw new NullReferenceException("Pending Group Chat context is null");
+		//}
 
-		this._pendingGroupChats = context.PendingGroupChats;
+		//this._pendingGroupChats = context.PendingGroupChats;
 	}
 
 	/// <summary>

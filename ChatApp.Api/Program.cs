@@ -19,33 +19,44 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+#region Enabling CORS
+string FrontendOrigin = "VueFrontendOrigin";
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy(name: FrontendOrigin, builder =>
+	{
+		builder.WithOrigins("http://localhost:8080").AllowAnyMethod().AllowAnyHeader();
+	});
+});
+#endregion
+
 // TODO: configure tls/ssl and http protocol
 builder.WebHost.ConfigureKestrel(o =>
 {
-	o.AddServerHeader = false;
-	//o.ConfigureEndpointDefaults(listenOptions =>
-	//{
-	//	listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
-	//});
-	//o.ConfigureHttpsDefaults(listenOptions =>
-	//{
-	//	listenOptions.SslProtocols = SslProtocols.Tls13 | SslProtocols.Tls12;
-	//	listenOptions.OnAuthenticate = (context, sslOptions) =>
-	//	{
-	//		sslOptions.EnabledSslProtocols = SslProtocols.Tls13 | SslProtocols.Tls12;
-	//		if (sslOptions.ApplicationProtocols != null)
-	//		{
-	//			sslOptions.ApplicationProtocols.Clear();
-	//		}
-	//		else
-	//		{
-	//			sslOptions.ApplicationProtocols = new();
-	//		}
+    o.AddServerHeader = false;
+    //o.ConfigureEndpointDefaults(listenOptions =>
+    //{
+    //	listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+    //});
+    //o.ConfigureHttpsDefaults(listenOptions =>
+    //{
+    //	listenOptions.SslProtocols = SslProtocols.Tls13 | SslProtocols.Tls12;
+    //	listenOptions.OnAuthenticate = (context, sslOptions) =>
+    //	{
+    //		sslOptions.EnabledSslProtocols = SslProtocols.Tls13 | SslProtocols.Tls12;
+    //		if (sslOptions.ApplicationProtocols != null)
+    //		{
+    //			sslOptions.ApplicationProtocols.Clear();
+    //		}
+    //		else
+    //		{
+    //			sslOptions.ApplicationProtocols = new();
+    //		}
 
-	//		sslOptions.ApplicationProtocols.Add(SslApplicationProtocol.Http2);
-	//		sslOptions.ApplicationProtocols.Add(SslApplicationProtocol.Http11);
-	//	};
-	//});
+    //		sslOptions.ApplicationProtocols.Add(SslApplicationProtocol.Http2);
+    //		sslOptions.ApplicationProtocols.Add(SslApplicationProtocol.Http11);
+    //	};
+    //});
 });
 
 // Add services to the container.
@@ -92,7 +103,7 @@ builder.Services.AddDbContext<ChatAppDbContext>(options =>
 	}
 });
 
-#region Auth
+#region Auth Settings
 builder.Services.AddIdentityCore<User>(option =>
 {
 	option.User.RequireUniqueEmail = true;
@@ -157,6 +168,8 @@ else
 app.UseHttpsRedirection();
 
 app.UseRouting();
+
+app.UseCors(FrontendOrigin);
 
 app.UseAuthentication();
 app.UseAuthorization();
