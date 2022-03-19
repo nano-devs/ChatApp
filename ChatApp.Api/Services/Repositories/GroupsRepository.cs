@@ -5,7 +5,7 @@ using ChatApp.Api.Models;
 
 using Microsoft.EntityFrameworkCore;
 
-public class GroupsRepository : Repository<Group>
+public class GroupsRepository : Repository<Group, int>, IGroupsRepository
 {
 	protected DbSet<Group> _groups;
 
@@ -19,17 +19,24 @@ public class GroupsRepository : Repository<Group>
 		this._groups = context.Groups;
 	}
 
-	public override Group? GetById(Guid id)
+	public override Group? GetById(int id)
 	{
 		return this._groups
 			.AsNoTrackingWithIdentityResolution()
 			.FirstOrDefault(o => o.Id == id);
 	}
 
-	public override async Task<Group?> GetByIdAsync(Guid id)
+	public override async Task<Group?> GetByIdAsync(int id)
 	{
 		return await this._groups
 			.AsNoTrackingWithIdentityResolution()
 			.FirstOrDefaultAsync(o => o.Id == id);
+	}
+
+	public async Task<Group?> GetByUniqueIdAsync(Guid uniqueId)
+	{
+		return await this._groups
+			.AsNoTrackingWithIdentityResolution()
+			.FirstOrDefaultAsync(o => o.UniqueGuid == uniqueId);
 	}
 }

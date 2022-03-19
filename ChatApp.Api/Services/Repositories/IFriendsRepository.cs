@@ -2,14 +2,14 @@
 
 using ChatApp.Api.Models;
 
-public interface IFriendsRepository : IRepository<Friends>
+public interface IFriendsRepository : IRepository<Friend, Guid>
 {
-	Task<IEnumerable<Guid>> GetFriendsAsync(Guid userId);
+	Task<IEnumerable<object>> GetFriendsAsync(int userId);
 
-	Task<bool> IsFriendExistAsync(Guid userId, Guid friendId);
+	Task<bool> IsFriendExistAsync(int userId, int friendId);
 
-	Task<bool> AddFriendshipAsync(Guid userId, Guid friendId);
+	Task<bool> AddFriendshipAsync(int userId, int friendId);
 
-	Task<bool> RemoveFriendshipAsync(Guid userId, Guid friendId);
+	Task<bool> RemoveFriendshipAsync(int userId, int friendId);
 
 }

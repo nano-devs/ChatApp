@@ -2,11 +2,11 @@
 
 using System.Linq.Expressions;
 
-public interface IRepository<T> where T : class
+public interface IRepository<T, TKey> where T : class
 {
-	T? GetById(Guid id);
+	T? GetById(TKey id);
 
-	Task<T?> GetByIdAsync(Guid id);
+	Task<T?> GetByIdAsync(TKey id);
 
 	IEnumerable<T> GetAll();
 

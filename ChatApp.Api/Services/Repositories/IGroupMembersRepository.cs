@@ -2,13 +2,15 @@
 
 using ChatApp.Api.Models;
 
-public interface IGroupMembersRepository : IRepository<GroupMember>
+public interface IGroupMembersRepository : IRepository<GroupMember, int>
 {
-	Task<IEnumerable<Guid>> GetGroupMembersAsync(Guid groupId);
+	Task<IEnumerable<int>> GetGroupMembersAsync(int groupId);
 
-	Task<bool> IsMemberExistAsync(Guid groupId, Guid userId);
+	Task<IEnumerable<int>> GetGroupMembersAsync(Guid groupUniqueId);
 
-	Task AddMemberAsync(Guid groupId, Guid userId);
+	Task<bool> IsMemberExistAsync(int groupId, int userId);
 
-	Task AddMemberRangeAsync(Guid groupId, IEnumerable<Guid> userIds);
+	Task AddMemberAsync(int groupId, int userId);
+
+	Task AddMemberRangeAsync(int groupId, IEnumerable<int> userIds);
 }
