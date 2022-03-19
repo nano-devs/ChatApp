@@ -11,7 +11,7 @@ Vue.use(VueRouter)
 const routes = [
     {
         path: '/',
-        component: {template: '<h1>This is home page</h1>'}
+        component: { template: '<h1>This is home page</h1>' }
     },
     {
         path: '/dm',
@@ -36,6 +36,11 @@ const routes = [
         component: NotFound,
     },
 ]
+
+router.beforeEach((to, from, next) => {
+    if (to.name !== 'Login' && !isAuthenticated) next({ name: 'Login' })
+    else next()
+})
 
 export default new VueRouter({
     mode: 'history',
