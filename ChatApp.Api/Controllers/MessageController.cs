@@ -3,7 +3,6 @@ namespace ChatApp.Api.Controllers;
 
 using ChatApp.Api.Data;
 using ChatApp.Api.Models;
-using ChatApp.Api.Models.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

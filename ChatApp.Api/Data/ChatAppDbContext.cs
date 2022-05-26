@@ -62,7 +62,5 @@ public class ChatAppDbContext : DbContext
 
 	public DbSet<GroupMessage>? GroupMessages { get; set; }
 
-	public DbSet<RefreshToken>? RefreshTokens { get; set; }
-
 	#endregion Properties
 }
