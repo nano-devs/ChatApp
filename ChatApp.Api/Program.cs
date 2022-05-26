@@ -1,20 +1,13 @@
 global using System;
-
+using AuthEndpoints;
 using ChatApp.Api.Data;
 using ChatApp.Api.Models;
-using ChatApp.Api.Models.Configurations;
-using ChatApp.Api.Services.Authenticators;
 using ChatApp.Api.Services.Repositories;
-using ChatApp.Api.Services.Repositories.RefreshTokenRepositories;
-using ChatApp.Api.Services.TokenGenerators;
-using ChatApp.Api.Services.TokenValidators;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -103,51 +96,42 @@ builder.Services.AddDbContext<ChatAppDbContext>(options =>
 	}
 });
 
-#region Auth Settings
-builder.Services.AddIdentityCore<User>(option =>
+builder.Services.AddIdentityCore<User>(options =>
 {
-	option.User.RequireUniqueEmail = true;
-	// For testing only, remove this for production
-	option.Password.RequireDigit = false;
-	option.Password.RequireNonAlphanumeric = false;
-	option.Password.RequireUppercase = false;
-	option.Password.RequiredLength = 0;
-}).AddEntityFrameworkStores<ChatAppDbContext>();
-builder.Services.AddSingleton<IdentityErrorDescriber>();
-builder.Services.AddScoped<IRefreshTokenRepository, DatabaseRefreshTokenRepository>();
-builder.Services.AddScoped<Authenticator>();
-builder.Services.AddSingleton<AccessTokenGenerator>();
-builder.Services.AddSingleton<RefreshTokenGenerator>();
-builder.Services.AddSingleton<ITokenValidator, RefreshTokenValidator>();
-AuthenticationConfiguration authConfig = new AuthenticationConfiguration();
-builder.Configuration.Bind("Authentication", authConfig);
-builder.Services.AddSingleton(authConfig);
-var refreshTokenValidationParameters = new TokenValidationParameters()
+	options.User.RequireUniqueEmail = true;
+	options.Password.RequireDigit = false;
+	options.Password.RequireNonAlphanumeric = false;
+	options.Password.RequireUppercase = false;
+	options.Password.RequiredLength = 0;
+}).AddEntityFrameworkStores<ChatAppDbContext>()
+  .AddTokenProvider<DataProtectorTokenProvider<User>>(TokenOptions.DefaultProvider);
+
+var accessValidationParam = new TokenValidationParameters()
 {
-	IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authConfig.RefreshTokenSecret!)),
-	ValidIssuer = authConfig.Issuer,
-	ValidAudience = authConfig.Audience,
+	IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("1234567890qwerty")),
+	ValidIssuer = "https://localhost:8000",
+	ValidAudience = "https://localhost:8000",
 	ValidateIssuerSigningKey = true,
-	ValidateIssuer = true,
-	ValidateAudience = true,
 	ClockSkew = TimeSpan.Zero,
 };
-builder.Services.AddSingleton(refreshTokenValidationParameters);
-builder.Services.AddSingleton<JwtSecurityTokenHandler>();
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(option =>
+
+builder.Services.AddAuthEndpoints<int, User>(options =>
 {
-	option.TokenValidationParameters = new TokenValidationParameters()
+	options.AccessSigningOptions = new JwtSigningOptions()
 	{
-		IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authConfig.AccessTokenSecret!)),
-		ValidIssuer = authConfig.Issuer,
-		ValidAudience = authConfig.Audience,
-		ValidateIssuerSigningKey = true,
-		ValidateIssuer = true,
-		ValidateAudience = true,
-		ClockSkew = TimeSpan.Zero,
-	}; ;
-});
-#endregion
+		SigningKey = accessValidationParam.IssuerSigningKey,
+		Algorithm = SecurityAlgorithms.HmacSha256,
+		ExpirationMinutes = 120,
+	};
+	options.RefreshSigningOptions = new JwtSigningOptions()
+	{
+		SigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("qwerty0987654321")),
+		Algorithm = SecurityAlgorithms.HmacSha256,
+		ExpirationMinutes = 2880,
+	};
+	options.Audience = "localhost:8000";
+	options.Issuer = "localhost:8000";
+}).AddJwtBearerAuthScheme(accessValidationParam);
 
 var app = builder.Build();
 
