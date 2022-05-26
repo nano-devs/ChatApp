@@ -1,6 +1,4 @@
-﻿namespace ChatApp.Api.Models.Requests;
-
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 public class PostMessageRequest<T>
 {
