@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
-[Authorize]
+[Authorize(AuthenticationSchemes = "jwt")]
 [Route("api/[controller]")]
 [ApiController]
 public class MessageController : ControllerBase
