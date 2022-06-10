@@ -454,5 +454,7 @@ $RECYCLE.BIN/
 !.vscode/extensions.json
 
 *.db
+*.db-shm
+*.db-wal
 *.pem
 *-key.pem
