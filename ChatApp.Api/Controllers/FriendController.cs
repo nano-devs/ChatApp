@@ -3,7 +3,7 @@ using ChatApp.Api.Services.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-[Authorize]
+[Authorize(AuthenticationSchemes = "jwt")]
 [ApiController]
 [Route("[controller]/[action]")]
 public class FriendController : ControllerBase
